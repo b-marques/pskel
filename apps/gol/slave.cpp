@@ -73,7 +73,6 @@ __parallel__ void stencilKernel(Array2D<int> input, Array2D<int> output,
   //   }
   //
     output(i,j) = (neighbors == 3 || (neighbors == 2 && central))?1:0;
-  //
   }
 }
 
@@ -84,8 +83,8 @@ int main(int argc,char **argv) {
   arg.dummy = 1;
   Mask2D<int> mask(8);
   mask.set(0,-1,-1);  mask.set(1,-1,0); mask.set(2,-1,1);
-  mask.set(3,0,-1);       mask.set(4,0,1);
-  mask.set(5,1,-1); mask.set(6,1,0);  mask.set(7,1,1);
+  mask.set(3,0,-1);                     mask.set(4,0,1);
+  mask.set(5,1,-1); mask.set(6,1,0);    mask.set(7,1,1);
   /*************************************************/
 
   // width = atoi (argv[1]);
@@ -102,7 +101,7 @@ int main(int argc,char **argv) {
   int height = atoi(argv[2]);
   int cluster_id = atoi(argv[3]);
   int nb_threads = atoi(argv[4]);
-  int iterations = atoi(argv[5]);
+  // int iterations = atoi(argv[5]);
   int outteriterations = atoi(argv[6]);
   int itMod = atoi(argv[7]);
 

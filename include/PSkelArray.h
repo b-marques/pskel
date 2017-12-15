@@ -71,11 +71,6 @@ private:
 	#endif
 	#ifdef PSKEL_MPPA
 	T *mppaArray;
- 	portal_t *write_portal;
- 	portal_t *read_portal;
- 	portal_t *aux_write_portal;
- 	portal_t *aux_read_portal;
- 	int* aux;
  	//T *comm_buffer;
 	#endif
 
@@ -123,23 +118,6 @@ public:
 	 * Frees the allocated device memory.
 	 **/
 	void deviceFree();
-	#endif
-
-
-	#ifdef PSKEL_MPPA
-	void portalReadAlloc(int trigger, int nb_cluster);
-	#endif
-
-	#ifdef PSKEL_MPPA
-	void portalWriteAlloc(int nb_cluster);
-	#endif
-
-	#ifdef PSKEL_MPPA
-	void portalAuxWriteAlloc(int nb_cluster);
-	#endif
-
-	#ifdef PSKEL_MPPA
-	void portalAuxReadAlloc(int trigger, int nb_cluster);
 	#endif
 
 	#ifdef PSKEL_MPPA
@@ -264,79 +242,6 @@ public:
 
 	#ifdef PSKEL_MPPA
 	void mppaFree();
-	#endif
-
-	#ifdef PSKEL_MPPA
-	void auxFree();
-	#endif
-
-	#ifdef PSKEL_MPPA
-	void setTrigger(int trigger);
-	#endif
-
-	#ifdef PSKEL_MPPA
-	int* getAux();
-	#endif
-
-	#ifdef PSKEL_MPPA
-	void auxAlloc();
-	#endif
-
-	#ifdef PSKEL_MPPA
-	void setAux(int heightOffset, int widthOffset, int it, int subIterations, size_t coreWidthOffset, size_t coreHeightOffset, size_t coreDepthOffset, size_t coreWidth, size_t coreHeight, size_t coreDepth, int outterIterations, size_t height, size_t width, size_t depth, int baseWidth, int baseHeight);
-	#endif
-
-	#ifdef PSKEL_MPPA
-	void copyToAux();
-	#endif
-
-	#ifdef PSKEL_MPPA
-	void copyFromAux();
-	#endif
-
-	#ifdef PSKEL_MPPA
-	void copyToo(size_t offsetSlave, size_t offsetMaster, int tam);
-	#endif
-
-	#ifdef PSKEL_MPPA
-	void copyTo(int coreHeight,int coreWidth, size_t sJump, size_t tJump, size_t sOffset, size_t tOffset);
-	#endif
-
-	#ifdef PSKEL_MPPA
-	void copyTo();
-	#endif
-
-
-	#ifdef PSKEL_MPPA
-	void copyFrom();
-	#endif
-
-	#ifdef PSKEL_MPPA
-	void waitRead();
-	#endif
-
-	#ifdef PSKEL_MPPA
-	void waitWrite();
-	#endif
-
-	#ifdef PSKEL_MPPA
-	void waitAuxWrite();
-	#endif
-
-	#ifdef PSKEL_MPPA
-	void closeReadPortal();
-	#endif
-
-	#ifdef PSKEL_MPPA
-	void closeAuxReadPortal();
-	#endif
-
-	#ifdef PSKEL_MPPA
-	void closeAuxWritePortal();
-	#endif
-
-	#ifdef PSKEL_MPPA
-	void closeWritePortal();
 	#endif
 
 	#ifdef PSKEL_MPPA

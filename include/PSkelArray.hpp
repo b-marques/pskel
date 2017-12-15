@@ -64,11 +64,6 @@ ArrayBase<T>::ArrayBase(size_t width, size_t height, size_t depth){
 	#endif
 	#ifdef PSKEL_MPPA
 	this->mppaArray = 0;
-	this->write_portal = 0;
-	this->read_portal = 0;
-	this->aux_write_portal = 0;
-	this->aux_read_portal = 0;
-	this->aux = (int *) malloc(sizeof(size_t*) * 16);
 	if(size()>0) this->mppaAlloc();
 	#else
 		if(size()>0) this->hostAlloc();
@@ -166,15 +161,6 @@ void ArrayBase<T>::mppaFree(){
 }
 #endif
 
-#ifdef PSKEL_MPPA
-template<typename T>
-void ArrayBase<T>::auxFree(){
-
-	free(this->aux);
-	this->aux = NULL;
-}
-#endif
-
 template<typename T>
 void ArrayBase<T>::hostAlloc(){
 	if(this->hostArray==NULL){
@@ -266,9 +252,6 @@ void ArrayBase<T>::hostSlice(Arrays array, size_t widthOffset, size_t heightOffs
 	this->realDepth = array.realDepth;
     std::cout << "Print barrier for management: " << std::endl;
     // std::cout << "ArrayWidthOffset: " << array.widthOffset << "ArrayHeightOffset: " << array.heightOffset <<std::endl;
-	#ifdef MPPA_MASTER
-
-	#endif
 	#ifndef PSKEL_MPPA
 	this->hostArray = array.hostArray;
 	#else
@@ -338,218 +321,6 @@ void ArrayBase<T>::mppaMasterClone(Arrays array){
 	//#ifdef MPPA_SLAVE
 	this->mppaMasterCopy(array);
 	//#endif
-}
-#endif
-
-
-#ifdef PSKEL_MPPA
-template<typename T>
-void ArrayBase<T>::setTrigger(int trigger){
-    mppa_aiocb_set_trigger(&read_portal->aiocb, trigger);
-}
-#endif
-
-#ifdef PSKEL_MPPA
-template<typename T>
-int* ArrayBase<T>::getAux(){
-	return this->aux;
-}
-#endif
-
-// #ifdef PSKEL_MPPA
-// template<typename T>
-// void ArrayBase<T>::auxAlloc(){
-// 	this->aux = (int *) malloc(sizeof(size_t*) * 13);
-// 	assert(this->aux != NULL);
-// }
-// #endif
-
-#ifdef PSKEL_MPPA
-template<typename T>
-void ArrayBase<T>::setAux(int heightOffset, int widthOffset, int it, int subIterations, size_t coreWidthOffset, size_t coreHeightOffset, size_t coreDepthOffset, size_t coreWidth, size_t coreHeight, size_t coreDepth, int outterIterations, size_t height, size_t width, size_t depth, int baseWidth, int baseHeight){
-
-    this->aux[0] = heightOffset;
-	this->aux[1] = it;
-	this->aux[2] = subIterations;
-	this->aux[3] = coreWidthOffset;
-	this->aux[4] = coreHeightOffset;
-	this->aux[5] = coreDepthOffset;
-	this->aux[6] = coreWidth;
-	this->aux[7] = coreHeight;
-	this->aux[8] = coreDepth;
-	this->aux[9] = outterIterations;
-	this->aux[10] = height;
-	this->aux[11] = width;
-	this->aux[12] = depth;
-    this->aux[13] = widthOffset;
-    this->aux[14] = baseWidth;
-    this->aux[15] = baseHeight;
-
-
-}
-#endif
-
-#ifdef PSKEL_MPPA
-template<typename T>
-void ArrayBase<T>::copyToAux(){
-	mppa_async_write_portal(this->aux_write_portal, this->aux, (sizeof(int) * 16), 0);
-}
-#endif
-
-#ifdef PSKEL_MPPA
-template<typename T>
-void ArrayBase<T>::copyFromAux(){
-	mppa_async_read_wait_portal(this->aux_read_portal);
-}
-#endif
-
-#ifdef PSKEL_MPPA
-template<typename T>
-void ArrayBase<T>::copyToo(size_t offsetSlave, size_t offsetMaster, int tam){
-    tam = tam*sizeof(T);
-	T *mppaSlicePtr = (T*)(this->mppaArray) + size_t(offsetSlave*realDepth);
-	mppa_async_write_portal(this->write_portal, mppaSlicePtr, tam, sizeof(T)*offsetMaster);
-}
-#endif
-
-#ifdef PSKEL_MPPA
-template<typename T>
-void ArrayBase<T>::copyTo(int coreHeight, int coreWidth, size_t sJump, size_t tJump, size_t sOffset, size_t tOffset){
-	// T *mppaSlicePtr = &((this->mppaArray) + size_t(sOffset*realDepth));
-    T *mppaSlicePtr = (T*)(this->mppaArray) + size_t(sOffset*realDepth);
-
-
-	int sstride = sJump*sizeof(T);
-	int tstride = tJump*sizeof(T);
-	int ecount = coreHeight;
-	int size = coreWidth*sizeof(T);
-
-	mppa_async_write_stride_portal(this->write_portal, mppaSlicePtr, size, ecount, sstride, tstride, sizeof(T)*tOffset);
-
-}
-#endif
-
-#ifdef PSKEL_MPPA
-template<typename T>
-void ArrayBase<T>::copyTo(){
-	T *mppaSlicePtr = (T*)(this->mppaArray);
-	mppa_async_write_portal(this->write_portal, mppaSlicePtr, this->memSize(), 0);
-
-
-}
-#endif
-
-#ifdef PSKEL_MPPA
-template<typename T>
-void ArrayBase<T>::copyFrom(){
-	mppa_async_read_wait_portal(this->read_portal);
-
-}
-#endif
-
-#ifdef PSKEL_MPPA
-template<typename T>
-void ArrayBase<T>::portalReadAlloc(int trigger, int nb_cluster){
-	#ifdef MPPA_MASTER
-		char pathMaster[256];
-	    sprintf(pathMaster, "/mppa/portal/%d:3", 128);
-		this->read_portal = mppa_create_read_portal(pathMaster, this->mppaArray, this->memSize(), trigger, NULL);
-	#endif
-	#ifdef MPPA_SLAVE
-	char pathSlave[25];
-	char path[25];
-	sprintf(pathSlave, "/mppa/portal/%d:%d", nb_cluster, 4 + nb_cluster);
-
-    this->read_portal = mppa_create_read_portal(pathSlave, this->mppaArray, this->memSize(), trigger, NULL);
-	#endif
-}
-#endif
-
-
-#ifdef PSKEL_MPPA
-template<typename T>
-void ArrayBase<T>::portalAuxWriteAlloc(int nb_cluster){
-	char path[256];
-	#ifdef MPPA_MASTER
-		sprintf(path, "/mppa/portal/%d:%d", nb_cluster, (21 + nb_cluster));
-    	this->aux_write_portal = mppa_create_write_portal(path, NULL, 0, nb_cluster);
-	#endif
-}
-#endif
-
-#ifdef PSKEL_MPPA
-template<typename T>
-void ArrayBase<T>::portalAuxReadAlloc(int trigger, int nb_cluster){
-	char path[25];
-	#ifdef MPPA_SLAVE
-		sprintf(path, "/mppa/portal/%d:%d", nb_cluster, (21 + nb_cluster));
-    	this->aux_read_portal = mppa_create_read_portal(path, this->aux, (sizeof(int) * 16), trigger, NULL);
-	#endif
-}
-#endif
-
-
-#ifdef PSKEL_MPPA
-template<typename T>
-void ArrayBase<T>::portalWriteAlloc(int nb_cluster){
-	char path[256];
-	#ifdef MPPA_MASTER
-		sprintf(path, "/mppa/portal/%d:%d", nb_cluster, 4 + nb_cluster);
-    	this->write_portal = mppa_create_write_portal(path, NULL, 0, nb_cluster);
-	#endif
-    #ifdef MPPA_SLAVE
-		sprintf(path, "/mppa/portal/%d:3", 128);
-    	this->write_portal = mppa_create_write_portal(path, NULL, 0, 128);
-    #endif
-}
-#endif
-
-#ifdef PSKEL_MPPA
-template<typename T>
-void ArrayBase<T>::waitRead(){
-	mppa_async_read_wait_portal(this->read_portal);
-}
-#endif
-
-#ifdef PSKEL_MPPA
-template<typename T>
-void ArrayBase<T>::waitWrite(){
-	mppa_async_write_wait_portal(this->write_portal);
-}
-#endif
-
-#ifdef PSKEL_MPPA
-template<typename T>
-void ArrayBase<T>::waitAuxWrite(){
-	mppa_async_write_wait_portal(this->aux_write_portal);
-}
-#endif
-
-#ifdef PSKEL_MPPA
-template<typename T>
-void ArrayBase<T>::closeReadPortal(){
-	mppa_close_portal(this->read_portal);
-}
-#endif
-
-#ifdef PSKEL_MPPA
-template<typename T>
-void ArrayBase<T>::closeAuxReadPortal(){
-	mppa_close_portal(this->aux_read_portal);
-}
-#endif
-
-#ifdef PSKEL_MPPA
-template<typename T>
-void ArrayBase<T>::closeAuxWritePortal(){
-	mppa_close_portal(this->aux_write_portal);
-}
-#endif
-
-#ifdef PSKEL_MPPA
-template<typename T>
-void ArrayBase<T>::closeWritePortal(){
-	mppa_close_portal(this->write_portal);
 }
 #endif
 

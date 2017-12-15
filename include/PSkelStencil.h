@@ -48,6 +48,22 @@
   #include "PSkelStencilTiling.h"
 //#endif
 
+#ifdef PSKEL_MPPA
+    #include <stdlib.h>
+    #include <mppa_power.h>
+    #include <mppa_routing.h>
+    #include <stdio.h>
+    #include <mppa_remote.h>
+    #include <mppa_async.h>
+    #include <assert.h>
+    #include <utask.h>
+    #include <HAL/hal/board/boot_args.h>
+    #include <sys/unistd.h>
+    #include <sys/_default_fcntl.h>
+    #include <HAL/hal/cluster/dnoc.h>
+    #include <HAL/hal/hal_ext.h>
+#endif //PSKEL_MPPA
+
 namespace PSkel{
 
 //*******************************************************************************************
@@ -246,7 +262,18 @@ public:
 
 	//void runIterativeHybrid(size_t iterations, float GPUPartition, size_t GPUBlockSize, size_t numThreads);
 
-	#ifdef PSKEL_MPPA
+	#ifdef MPPA_MASTER
+	/**
+	 * Initialization of IO CLuster and Async Communication.
+	 **/
+	void mppa_init_io_cluster(int nb_clusters, mppadesc_t &pcie_fd);
+	/**
+	 * End of IO CLuster and Async Communication.
+	 **/
+	void mppa_end_io_cluster(mppadesc_t &pcie_fd);
+	#endif // MPPA_MASTER
+
+	#ifdef MPPA_MASTER
 	/**
 	 * Spawn the slaves in MPPA.
 	 * \param[in] slave_bin_name the name of the slave bynary code.
@@ -254,10 +281,10 @@ public:
 	 * \param[in] nb_clusters the number of clusters to be spawn.
 	 * \param[in] nb_threads the number of threads per cluster.
 	 **/
-	void spawn_slaves(const char slave_bin_name[], size_t tilingHeight, size_t tilingWidth, int nb_clusters, int nb_threads, int iterations, int innerIterations);
+	void spawn_slaves(const char slave_bin_name[], size_t tilingHeight, size_t tilingWidth, int nb_clusters, int nb_threads, int iterations, int innerIterations, mppadesc_t &pcie_fd);
 	#endif
 
-	#ifdef PSKEL_MPPA
+	#ifdef MPPA_MASTER
 	/**
 	* Create the slices for MPPA.
 	* \param[in] tilingHeight the height for each tile.
@@ -266,15 +293,15 @@ public:
 	void mppaSlice(size_t tilingHeight, size_t tilingWidth, int nb_clusters, int iterations, int innerIterations);
 	#endif
 
-	#ifdef PSKEL_MPPA
+	#ifdef MPPA_MASTER
 	/**
 	* wait for the slaves to complete.
 	* \param[in] nb_clusters the number of clusters to wait.
 	**/
-	void waitSlaves(int nb_clusters, int tilingHeight, int tilingWidth);
+	void waitSlaves(int nb_clusters, int tilingHeight, int tilingWidth, mppadesc_t &pcie_fd);
 	#endif
 
-	#ifdef PSKEL_MPPA
+	#ifdef MPPA_MASTER
 	/**
 	* Configure the slave execution and wait for them to finish.
 	* \param[in] slave_bin_name the name of the slave bynary code.
