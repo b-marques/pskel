@@ -64,6 +64,13 @@
     #include <HAL/hal/hal_ext.h>
 #endif //PSKEL_MPPA
 
+#ifdef MPPA_SLAVE
+	#include <mOS_common_types_c.h>
+	#include <mOS_vcore_u.h>
+	#include <mOS_segment_manager_u.h>
+	#include <mppa_dsm_client.h>
+#endif
+
 namespace PSkel{
 
 //*******************************************************************************************
@@ -281,7 +288,7 @@ public:
 	 * \param[in] nb_clusters the number of clusters to be spawn.
 	 * \param[in] nb_threads the number of threads per cluster.
 	 **/
-	void spawn_slaves(const char slave_bin_name[], size_t tilingHeight, size_t tilingWidth, int nb_clusters, int nb_threads, int iterations, int innerIterations, mppadesc_t &pcie_fd);
+	void spawn_slaves(const char slave_bin_name[], size_t width, size_t height, size_t tilingHeight, size_t tilingWidth, int nb_clusters, int nb_threads, int iterations, int innerIterations, mppadesc_t &pcie_fd);
 	#endif
 
 	#ifdef MPPA_MASTER
@@ -310,7 +317,7 @@ public:
 	* \param[in] tilingHeight the height for each tile.
 	* \param[in] iterations the number of iterations for the execution.
 	**/
-	void scheduleMPPA(const char slave_bin_name[], int nb_clusters, int nb_threads, size_t tilingHeight, size_t tilingWidth, int iterations, int innerIterations);
+	void scheduleMPPA(const char slave_bin_name[], int nb_clusters, int nb_threads, size_t width, size_t height, size_t tilingHeight, size_t tilingWidth, int iterations, int innerIterations);
 	#endif
 
 	#ifdef PSKEL_MPPA
@@ -320,7 +327,7 @@ public:
 	* \param[in] nb_threads the number of threads for the kernel execution.
 	* \param[in] nb_tiles the number of tiles for the cluster to execute.
 	**/
-	void runMPPA(int cluster_id, int nb_threads, int nb_tiles, int outterIterations, int itMod);
+	void runMPPA(int cluster_id, int nb_threads, int nb_tiles, int outterIterations, int itMod, int nb_clusters, int width, int height);
 	#endif
 
 	#ifdef PSKEL_MPPA

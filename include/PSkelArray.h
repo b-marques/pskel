@@ -42,6 +42,7 @@
 
 #ifdef PSKEL_MPPA
 #include "common.h"
+#include <mppa_async.h>
 //#include "interface_mppa.h"
 #endif
 
@@ -71,6 +72,7 @@ private:
 	#endif
 	#ifdef PSKEL_MPPA
 	T *mppaArray;
+  mppa_async_segment_t mppa_segment;
  	//T *comm_buffer;
 	#endif
 
@@ -198,9 +200,16 @@ public:
 	void mppaClone(Arrays array);
 
 
-	template<typename Arrays>
+  template<typename Arrays>
 	void mppaMasterClone(Arrays array);
 
+  #ifdef PSKEL_MPPA
+  void mppa_segment_create(int id);
+  #endif
+
+  #ifdef PSKEL_MPPA
+  void mppa_segment_clone(int id);
+  #endif
 	//template<typename Arrays>
 	//void offsetMppaMasterCopy(Arrays array, int heightOffset, int widthOffset, int tilingHeight, int tilingWidth);
 
@@ -243,6 +252,14 @@ public:
 	#ifdef PSKEL_MPPA
 	void mppaFree();
 	#endif
+
+  #ifdef PSKEL_MPPA
+  void mppa_get_block2d(const mppa_async_point2d_t *remote_point);
+  #endif
+
+  #ifdef PSKEL_MPPA
+  void mppa_put_block2d(const mppa_async_point2d_t *remote_point);
+  #endif
 
 	#ifdef PSKEL_MPPA
 	__host__ __forceinline__ T & mppaGet(size_t h,size_t w,size_t d) const ;

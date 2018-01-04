@@ -8,7 +8,7 @@
 
 #define PSKEL_MPPA
 #define MPPA_MASTER
-// #define DEBUG
+#define DEBUG
 //#define BUG_TEST
 // #define PRINT_OUT
 // #define TIME_EXEC
@@ -37,7 +37,7 @@ int main(int argc, char **argv){
 	if(argc != 9){
 		printf ("Wrong number of parameters.\n");
 		printf("Usage: WIDTH HEIGHT TILING_HEIGHT TILING_WIDTH ITERATIONS INNER_ITERATIONS NUMBER_CLUSTERS NUMBER_THREADS\n");
-		mppa_exit(-1);
+		exit(-1);
 	}
 
 	//Stencil configuration
@@ -68,38 +68,39 @@ int main(int argc, char **argv){
       outputGrid(h,w) = rand()%2;
 		}
 	}
+	inputGrid(0,0) = 1;
 
-	for(int h=0;h<height;h++) {
-		for(int w=0;w<width;w++) {
-		  printf("inputGrid(%d,%d) = %d;\n", h, w, inputGrid(h,w));
-		}
-	}
-	for(int h=0;h<height;h++) {
-		for(int w=0;w<width;w++) {
-      printf("outputGrid(%d,%d) = %d;\n", h, w, outputGrid(h,w));
-		}
-	}
+	// for(int h=0;h<height;h++) {
+	// 	for(int w=0;w<width;w++) {
+	// 	  printf("inputGrid(%d,%d) = %d;\n", h, w, inputGrid(h,w));
+	// 	}
+	// }
+	// for(int h=0;h<height;h++) {
+	// 	for(int w=0;w<width;w++) {
+ //      printf("outputGrid(%d,%d) = %d;\n", h, w, outputGrid(h,w));
+	// 	}
+	// }
 
 	//Instantiate Stencil 2D
 	Stencil2D<Array2D<int>, Mask2D<int>, Arguments> stencil(inputGrid, outputGrid, mask);
-	struct timeval start = mppa_master_get_time();
+	//struct timeval start = mppa_master_get_time();
 
 	//Schedule computation to slaves
-	stencil.scheduleMPPA("slave", nb_clusters, nb_threads, tilingHeight, tilingWidth, iterations, innerIterations);
+	stencil.scheduleMPPA("cluster_bin", nb_clusters, nb_threads, width, height, tilingHeight, tilingWidth, iterations, innerIterations);
 
-	struct timeval end=mppa_master_get_time();
-	cout<<"Master Time: " << mppa_master_diff_time(start,end) << endl;
+	//struct timeval end=mppa_master_get_time();
+	//cout<<"Master Time: " << mppa_master_diff_time(start,end) << endl;
 
-	for(int h=0;h<height;h++) {
-		for(int w=0;w<width;w++) {
-		  printf("inputGrid(%d,%d) = %d;\n", h, w, inputGrid(h,w));
-		}
-	}
-	for(int h=0;h<height;h++) {
-		for(int w=0;w<width;w++) {
-      printf("outputGrid(%d,%d) = %d;\n", h, w, outputGrid(h,w));
-		}
-	}
+	// for(int h=0;h<height;h++) {
+	// 	for(int w=0;w<width;w++) {
+		  printf("inputGrid(%d,%d) = %d;\n", 0, 1, inputGrid(0,1));
+	// 	}
+	// }
+	// for(int h=0;h<height;h++) {
+	// 	for(int w=0;w<width;w++) {
+ //      printf("outputGrid(%d,%d) = %d;\n", h, w, outputGrid(h,w));
+	// 	}
+	// }
 
-	mppa_exit(0);
+	exit(0);
 }

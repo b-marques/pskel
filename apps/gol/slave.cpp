@@ -97,22 +97,24 @@ int main(int argc,char **argv) {
   // tileIterations = atoi(argv[8]);
 
   int nb_tiles = atoi(argv[0]);
-  int width = atoi(argv[1]);
-  int height = atoi(argv[2]);
+  int tilling_width = atoi(argv[1]);
+  int tilling_height = atoi(argv[2]);
   int cluster_id = atoi(argv[3]);
   int nb_threads = atoi(argv[4]);
   // int iterations = atoi(argv[5]);
   int outteriterations = atoi(argv[6]);
   int itMod = atoi(argv[7]);
+  int nb_clusters = atoi(argv[8]);
+  int width = atoi(argv[9]);
+  int height = atoi(argv[10]);
 
-
-  Array2D<int> partInput(width, height);
-  Array2D<int> output(width, height);
+  Array2D<int> partInput(tilling_width, tilling_height);
+  Array2D<int> output(tilling_width, tilling_height);
   Stencil2D<Array2D<int>, Mask2D<int>, Arguments> stencil(partInput, output, mask, arg);
   // if(iterations == 0)  {
-  stencil.runMPPA(cluster_id, nb_threads, nb_tiles, outteriterations, itMod);
+  stencil.runMPPA(cluster_id, nb_threads, nb_tiles, outteriterations, itMod, nb_clusters, width, height);
   // } else {
   //      stencil.runIterativeMPPA(cluster_id, nb_threads, nb_tiles, iterations);
   //}
-
+  return 0;
 }

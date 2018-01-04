@@ -38,6 +38,8 @@
 #include <omp.h>
 #endif
 
+#include <assert.h>
+
 // Maximum size of the cluster
 #define KB 1024
 #define MB 1024 * KB
@@ -229,6 +231,44 @@ T& ArrayBase<T>::mppaGet(size_t h, size_t w, size_t d) const {
 }
 #endif
 
+#ifdef PSKEL_MPPA
+template<typename T>
+void ArrayBase<T>::mppa_get_block2d(const mppa_async_point2d_t *remote_point) {
+
+  mppa_async_point2d_t local_point = {
+    0, 												// xpos
+    0,                        // ypos
+    (int)this->width,              // xdim
+    (int)this->height,             // ydim
+  };
+	assert(mppa_async_sget_block2d(this->mppaArray, 
+																 &(this->mppa_segment),
+																 0, sizeof(T), this->width, this->height,
+																 &local_point,
+																 remote_point,
+																 NULL) == 0);
+}
+#endif
+
+#ifdef PSKEL_MPPA
+template<typename T>
+void ArrayBase<T>::mppa_put_block2d(const mppa_async_point2d_t *remote_point) {
+
+  mppa_async_point2d_t local_point = {
+    0, 												// xpos
+    0,                        // ypos
+    (int)this->width,              // xdim
+    (int)this->height,             // ydim
+  };
+	assert(mppa_async_sput_block2d(this->mppaArray, 
+																 &(this->mppa_segment),
+																 0, sizeof(T), this->width, this->height,
+																 &local_point,
+																 remote_point,
+																 NULL) == 0);
+}
+#endif
+
 template<typename T> template<typename Arrays>
 void ArrayBase<T>::hostSlice(Arrays array, size_t widthOffset, size_t heightOffset, size_t depthOffset, size_t width, size_t height, size_t depth){
 	//maintain previous allocated area
@@ -321,6 +361,20 @@ void ArrayBase<T>::mppaMasterClone(Arrays array){
 	//#ifdef MPPA_SLAVE
 	this->mppaMasterCopy(array);
 	//#endif
+}
+#endif
+
+#ifdef PSKEL_MPPA
+template<typename T>
+void ArrayBase<T>::mppa_segment_create(int id){
+	assert(mppa_async_segment_create(&(this->mppa_segment), id, this->mppaArray, size()*sizeof(T), 0, 0, NULL) == 0);
+}
+#endif
+
+#ifdef PSKEL_MPPA
+template<typename T>
+void ArrayBase<T>::mppa_segment_clone(int id){
+	assert(mppa_async_segment_clone(&(this->mppa_segment), id , NULL, 0, NULL) == 0);
 }
 #endif
 

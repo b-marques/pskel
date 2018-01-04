@@ -1,0 +1,1 @@
+cmd_output/bin/multibin_bin.mpk := pushd output/bin > /dev/null; /usr/local/k1tools/bin/k1-create-multibinary  --clusters cluster_bin --clusters-names cluster_bin     --boot io_bin --bootname io_bin -T multibin_bin.mpk -i mpk -f  ; popd > /dev/null

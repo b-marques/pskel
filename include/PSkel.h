@@ -74,9 +74,7 @@ runtime details.
 #include <tbb/parallel_for.h>
 #include <tbb/task_scheduler_init.h>
 #endif
-#ifdef PSKEL_MPPA
-#include "interface_mppa.h"
-#endif
+
 #ifndef MPPA_MASTER
 #include <omp.h>
 #endif

@@ -15,7 +15,7 @@ COMPILE_OPTI := -O3
 cluster-bin := cluster_bin
 cluster-system := $(cluster_system)
 cluster_bin-srcs := slave.cpp
-cluster-cppflags := -g ${COMPILE_OPTI} -mhypervisor -I . -Wall -fopenmp -I../../lib/
+cluster-cppflags := -g -DMPPA_TRACE_ENABLE ${COMPILE_OPTI} -mhypervisor -I . -Wall -fopenmp -std=c++14
 cluster-lflags := -g -mhypervisor -lm -Wl,--defsym=USER_STACK_SIZE=0x2000 -Wl,--defsym=KSTACK_SIZE=0x1000 -lgomp
 ifeq ($(cluster_system), bare)
 cluster-lflags += -lvbsp -lutask -lmppa_remote -lmppa_async -lmppa_request_engine -lmppapower -lmppanoc -lmpparouting -Wl,--defsym=_LIBNOC_DISABLE_FIFO_FULL_CHECK=0
@@ -25,18 +25,20 @@ cluster-lflags += -pthread -lmppa_remote -lmppa_async -lmppa_request_engine -lmp
 endif
 
 io-bin := io_bin
-io_bin-srcs := master.cpp ../../include/interface_mppa.cpp
-io_bin-cppflags := -std=c++11 -g ${COMPILE_OPTI} -DMPPA_TRACE_ENABLE -Wall -mhypervisor
-io_bin-lflags := -lvbsp -lmppa_remote -lmppa_async -lmppa_request_engine -lpcie_queue -lutask  -lmppapower -lmppanoc -lmpparouting -mhypervisor -Wl,--defsym=_LIBNOC_DISABLE_FIFO_FULL_CHECK=0 -lmppa_remote
+io_bin-srcs := master.cpp
+io_bin-cppflags := -g ${COMPILE_OPTI} -DMPPA_TRACE_ENABLE -Wall -mhypervisor -std=c++14
+io_bin-lflags := -lvbsp -lmppa_remote -lmppa_async -lmppa_request_engine -lpcie_queue -lutask  -lmppapower -lmppanoc -lmpparouting -mhypervisor -Wl,--defsym=_LIBNOC_DISABLE_FIFO_FULL_CHECK=0 -Wl,--defsym=_start_async_copy=0
 
 mppa-bin := multibin_bin
 multibin_bin-objs = io_bin cluster_bin
 
 host-bin := host_bin
 host_bin-srcs := host_main.c
-host-cflags := -Wall ${COMPILE_OPTI} -fopenmp
+host-cppflags := -Wall ${COMPILE_OPTI} -g
 host-lflags := -lpthread -lm -lrt -lmppa_remote -lpcie
 host-bin    := host_bin
+
+clean-hooks := clean1
 
 include $(K1_TOOLCHAIN_DIR)/share/make/Makefile.kalray
 
@@ -74,7 +76,7 @@ run_jtag: all
 run_hw: all
 	./${O}/bin/host_bin ./${O}/bin/multibin_bin.mpk io_bin
 
-clean2: clean
-
-
 endif
+
+clean1:
+	rm -fr ${O} *~ MPPA.* bostan.*.trace* tracefile.* traces/ profile/ tracedtv/ callgrind/

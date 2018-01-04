@@ -50,7 +50,7 @@ using namespace std;
 #include <ga/std_stream.h>
 #endif
 
-#define ARGC_SLAVE 8
+#define ARGC_SLAVE 12
 
 namespace PSkel{
 
@@ -187,10 +187,9 @@ namespace PSkel{
 
 #ifdef MPPA_MASTER
     template<class Array, class Mask, class Args>
-        void StencilBase<Array, Mask,Args>::spawn_slaves(const char slave_bin_name[], size_t tiling_height, size_t tiling_width, int nb_clusters, int nb_threads, int iterations, int inner_iterations, mppadesc_t &pcie_fd){
+        void StencilBase<Array, Mask,Args>::spawn_slaves(const char slave_bin_name[], size_t width, size_t height, size_t tiling_height, size_t tiling_width, int nb_clusters, int nb_threads, int iterations, int inner_iterations, mppadesc_t &pcie_fd){
             
             // Prepare arguments to send to slaves
-            int i;
             int cluster_id;
             
             size_t w_tiling = ceil(float(this->input.getWidth())/float(tiling_width));
@@ -214,8 +213,9 @@ namespace PSkel{
 #endif //DEBUG
 
             char **argv_slave = (char**) malloc(sizeof (char*) * ARGC_SLAVE);
-            for (i = 0; i < ARGC_SLAVE; i++)
-                argv_slave[i] = (char*) malloc (sizeof (char) * 11);
+            for(auto i = 0; i < ARGC_SLAVE; ++i){
+                argv_slave[i] = (char*) malloc (sizeof (char) * 10);
+            }
 
             sprintf(argv_slave[1], "%d", tiling_width);
             sprintf(argv_slave[2], "%d", tiling_height);
@@ -223,8 +223,14 @@ namespace PSkel{
             sprintf(argv_slave[5], "%d", iterations);
             sprintf(argv_slave[6], "%d", outter_iterations);
             sprintf(argv_slave[7], "%d", it_mod);
+            sprintf(argv_slave[8], "%d", nb_clusters);
+            sprintf(argv_slave[9], "%d", width);
+            sprintf(argv_slave[10], "%d", height);
+            argv_slave[11] = NULL;
+
 
             this->mppa_init_io_cluster(nb_clusters, pcie_fd);
+
             // Spawn slave processes
             for (cluster_id = 0; cluster_id < nb_clusters && cluster_id < (int)total_size; cluster_id++) {
                 r = (cluster_id < it_mod)?1:0;
@@ -232,11 +238,17 @@ namespace PSkel{
 
                 sprintf(argv_slave[0], "%d", tiles_slave);
                 sprintf(argv_slave[3], "%d", cluster_id);
-
                 if (mppa_power_base_spawn(cluster_id, slave_bin_name, (const char **)argv_slave, NULL, MPPA_POWER_SHUFFLING_ENABLED) == -1)
                     printf("# [IODDR0] Fail to Spawn cluster %d\n", cluster_id);
             }
-            for (i = 0; i < ARGC_SLAVE; i++)
+
+            // create a task to manage the rpc server on another processor
+            utask_t t;
+            utask_create(&t, NULL, (void* (*)(void*))mppa_rpc_server_start, NULL);
+
+            //assert(mppa_async_segment_create(&segment, 1, buffer, 16*sizeof(int), 0, 0, NULL) == 0);
+
+            for (auto i = 0; i < ARGC_SLAVE; ++i)
                 free(argv_slave[i]);
             free(argv_slave);
         }
@@ -264,6 +276,8 @@ namespace PSkel{
             if(status != 0)
                 exit(-1);
 
+            // assert(mppa_async_segment_destroy(&segment) == 0);
+
             this->mppa_end_io_cluster(pcie_fd);
         
         }
@@ -272,10 +286,10 @@ namespace PSkel{
 
 #ifdef MPPA_MASTER
     template<class Array, class Mask, class Args>
-        void StencilBase<Array, Mask,Args>::scheduleMPPA(const char slave_bin_name[], int nb_clusters, int nb_threads, size_t tilingHeight, size_t tilingWidth, int iterations, int innerIterations){
+        void StencilBase<Array, Mask,Args>::scheduleMPPA(const char slave_bin_name[], int nb_clusters, int nb_threads, size_t width, size_t height, size_t tilingHeight, size_t tilingWidth, int iterations, int innerIterations){
 
             mppadesc_t pcie_fd;
-            this->spawn_slaves(slave_bin_name, tilingHeight, tilingWidth, nb_clusters, nb_threads, iterations, innerIterations, pcie_fd);
+            this->spawn_slaves(slave_bin_name, width, height, tilingHeight, tilingWidth, nb_clusters, nb_threads, iterations, innerIterations, pcie_fd);
             //this->mppaSlice(tilingHeight, tilingWidth, nb_clusters, iterations, innerIterations);
             this->waitSlaves(nb_clusters, tilingHeight, tilingWidth, pcie_fd);
 
@@ -283,9 +297,9 @@ namespace PSkel{
 #endif //MPPA_MASTER
 
 
-#ifdef PSKEL_MPPA
+#ifdef MPPA_SLAVE
     template<class Array, class Mask, class Args>
-        void StencilBase<Array, Mask,Args>::runMPPA(int cluster_id, int nb_threads, int nb_tiles, int outterIterations, int itMod){
+        void StencilBase<Array, Mask,Args>::runMPPA(int cluster_id, int nb_threads, int nb_tiles, int outterIterations, int itMod, int nb_clusters, int width, int height){
             // Array finalArr;
             // Array coreTmp;
             // Array tmp;
@@ -385,10 +399,59 @@ namespace PSkel{
             //     }
             //     mppa_close_barrier(global_barrier);
             // }
-            printf("runmppa slave\n");
+            mppa_rpc_client_init();
+            mppa_async_init();
+            mppa_remote_client_init();
 
+
+
+            this->input.mppa_segment_clone(1);
+
+            for (int i = 0; i < height; i+=this->input.getHeight()){
+                
+                mppa_async_point2d_t remote_point = {
+                    (int)this->input.getWidth() * cluster_id, // xpos
+                    i,                                   // ypos
+                    (int)this->input.getWidth(),              // xdim
+                    (int)this->input.getHeight()              // ydim
+                };
+
+                this->input.mppa_get_block2d(&remote_point);
+
+                this->runIterativeMPPA(this->input, this->output, 1 /*nb_iterations*/, nb_threads);
+
+                this->output.mppa_segment_clone(2);
+                this->output.mppa_put_block2d(&remote_point);
+
+                mppa_rpc_barrier_all();
+            }
+
+            // mppa_async_segment_t segment;
+            // assert(mppa_async_segment_clone(&segment, 1, NULL, 0, NULL) == 0);
+
+            // assert(mppa_async_get(&buffer, &segment, 0, 16*sizeof(int), NULL) == 0);
+            // printf("[Cluster %d] buffer before = %d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d\n", cid, buffer[0],buffer[1],buffer[2],buffer[3],buffer[4],buffer[5],buffer[6],buffer[7],buffer[8],buffer[9],buffer[10],buffer[11],buffer[12],buffer[13],buffer[14],buffer[15]);
+
+            // printf("barrier up\n");
+
+            // mppa_rpc_barrier_all();
+
+            // printf("barrier down\n");
+
+            // assert(mppa_async_put(&cid, &segment, cid*sizeof(int), sizeof(int), NULL) == 0);
+
+            // printf("barrier down2\n");
+
+            // mppa_rpc_barrier_all();
+
+            // assert(mppa_async_get(&buffer, &segment, 0, 16*sizeof(int), NULL) == 0);
+            // printf("[Cluster %d] buffer after = %d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d\n", cid, buffer[0],buffer[1],buffer[2],buffer[3],buffer[4],buffer[5],buffer[6],buffer[7],buffer[8],buffer[9],buffer[10],buffer[11],buffer[12],buffer[13],buffer[14],buffer[15]);
+
+            // printf("[Cluster %d] Goodbye\n", cid);
+          
+            mppa_async_final();
         }
-#endif
+#endif // MPPA_SLAVE
 #ifdef PSKEL_MPPA
 #ifndef MPPA_MASTER
     template<class Array, class Mask, class Args>
@@ -1139,6 +1202,10 @@ namespace PSkel{
             this->input = _input;
             this->output = _output;
             this->mask = _mask;
+            #ifdef MPPA_MASTER
+            this->input.mppa_segment_create(1);
+            this->output.mppa_segment_create(2);
+            #endif 
         }
 
 
