@@ -28,15 +28,15 @@ struct Arguments
 namespace PSkel{
 __parallel__ void stencilKernel(Array2D<int> input, Array2D<int> output,
     Mask2D<int> mask, Arguments args, size_t i, size_t j){
-    int neighbors =  input(i-1,j-1) + input(i-1,j) + input(i-1,j+1)  +
-                    input(i+1,j-1) + input(i+1,j) + input(i+1,j+1)  +
-                    input(i,j-1)   + input(i,j+1) ;
+    // int neighbors =  input(i-1,j-1) + input(i-1,j) + input(i-1,j+1)  +
+    //                 input(i+1,j-1) + input(i+1,j) + input(i+1,j+1)  +
+    //                 input(i,j-1)   + input(i,j+1) ;
     bool central = input(i,j);
-    // int neighbors = mask.get(0,input,i,j) + mask.get(1,input,i,j) + mask.get(2,input,i,j) +
-    //                mask.get(3,input,i,j) + mask.get(4,input,i,j) + mask.get(5,input,i,j) +
-    //          mask.get(6,input,i,j) + mask.get(7,input,i,j);
-    //
-    //
+    int neighbors = mask.get(0,input,i,j) + mask.get(1,input,i,j) + mask.get(2,input,i,j) +
+                   mask.get(3,input,i,j) + mask.get(4,input,i,j) + mask.get(5,input,i,j) +
+             mask.get(6,input,i,j) + mask.get(7,input,i,j);
+    
+    
 
   //   int neighbors = 0;
   //   int height=input.getHeight();

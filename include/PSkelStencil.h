@@ -145,7 +145,7 @@ protected:
 
 	#ifndef MPPA_MASTER
 	// virtual void runOpenMP(Array in, Array out, size_t numThreads) = 0;
-  virtual inline __attribute__((always_inline)) void runOpenMP(Array in, Array out, size_t width, size_t height, size_t depth, size_t maskRange, size_t numThreads) = 0;
+  virtual void runOpenMP(Array in, Array out, size_t width, size_t height, size_t depth, size_t maskRange, size_t numThreads) = 0;
 	#endif
 
 	#ifdef PSKEL_CUDA

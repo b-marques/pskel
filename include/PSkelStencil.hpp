@@ -412,42 +412,28 @@ namespace PSkel{
                 mppa_async_point2d_t remote_point = {
                     (int)this->input.getWidth() * cluster_id, // xpos
                     i,                                   // ypos
-                    (int)this->input.getWidth(),              // xdim
-                    (int)this->input.getHeight()              // ydim
+                    width,              // xdim
+                    height              // ydim
                 };
 
+
                 this->input.mppa_get_block2d(&remote_point);
+
+                // if(cluster_id == 0) {
+                //     for(unsigned h=0;h<this->input.getHeight();h++) {
+                //         for(unsigned w=0;w<this->input.getWidth();w++) {
+                //           printf("inputGrid-slave(%d,%d) = %d;\n", h, w, this->input(h,w));
+                //         }
+                //     }
+                // }
 
                 this->runIterativeMPPA(this->input, this->output, 1 /*nb_iterations*/, nb_threads);
 
                 this->output.mppa_segment_clone(2);
                 this->output.mppa_put_block2d(&remote_point);
-
-                mppa_rpc_barrier_all();
             }
-
-            // mppa_async_segment_t segment;
-            // assert(mppa_async_segment_clone(&segment, 1, NULL, 0, NULL) == 0);
-
-            // assert(mppa_async_get(&buffer, &segment, 0, 16*sizeof(int), NULL) == 0);
-            // printf("[Cluster %d] buffer before = %d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d\n", cid, buffer[0],buffer[1],buffer[2],buffer[3],buffer[4],buffer[5],buffer[6],buffer[7],buffer[8],buffer[9],buffer[10],buffer[11],buffer[12],buffer[13],buffer[14],buffer[15]);
-
-            // printf("barrier up\n");
-
-            // mppa_rpc_barrier_all();
-
-            // printf("barrier down\n");
-
-            // assert(mppa_async_put(&cid, &segment, cid*sizeof(int), sizeof(int), NULL) == 0);
-
-            // printf("barrier down2\n");
-
-            // mppa_rpc_barrier_all();
-
-            // assert(mppa_async_get(&buffer, &segment, 0, 16*sizeof(int), NULL) == 0);
-            // printf("[Cluster %d] buffer after = %d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d\n", cid, buffer[0],buffer[1],buffer[2],buffer[3],buffer[4],buffer[5],buffer[6],buffer[7],buffer[8],buffer[9],buffer[10],buffer[11],buffer[12],buffer[13],buffer[14],buffer[15]);
-
-            // printf("[Cluster %d] Goodbye\n", cid);
+            
+            mppa_rpc_barrier_all();
           
             mppa_async_final();
         }
@@ -1142,6 +1128,7 @@ namespace PSkel{
 #ifndef MPPA_MASTER
     template<class Array, class Mask, class Args>
         void Stencil3D<Array,Mask,Args>::runOpenMP(Array in, Array out, size_t numThreads){
+            printf("teste");
             omp_set_num_threads(numThreads);
 #pragma omp parallel for
             for (int h = 0; h < in.getHeight(); h++){
@@ -1237,7 +1224,7 @@ namespace PSkel{
 
 #ifndef MPPA_MASTER
     template<class Array, class Mask, class Args>
-        inline __attribute__((always_inline)) void Stencil2D<Array,Mask,Args>::runOpenMP(Array in, Array out, size_t width, size_t height, size_t depth, size_t maskRange, size_t numThreads){
+        void Stencil2D<Array,Mask,Args>::runOpenMP(Array in, Array out, size_t width, size_t height, size_t depth, size_t maskRange, size_t numThreads){
 //             size_t hrange = height-maskRange;
 //             size_t wrange = width-maskRange;
 //             int count = 0;

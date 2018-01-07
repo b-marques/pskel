@@ -241,12 +241,18 @@ void ArrayBase<T>::mppa_get_block2d(const mppa_async_point2d_t *remote_point) {
     (int)this->width,              // xdim
     (int)this->height,             // ydim
   };
+
 	assert(mppa_async_sget_block2d(this->mppaArray, 
 																 &(this->mppa_segment),
 																 0, sizeof(T), this->width, this->height,
 																 &local_point,
 																 remote_point,
 																 NULL) == 0);
+
+	// assert(mppa_async_get_spaced(this->mppaArray,
+	// 														 &(this->mppa_segment),
+	// 														 0, sizeof(T)*3, this->height, 48*sizeof(T),
+	// 														 NULL) == 0);
 }
 #endif
 

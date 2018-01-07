@@ -64,17 +64,17 @@ int main(int argc, char **argv){
 	for(int h=0;h<height;h++) {
 		for(int w=0;w<width;w++) {
 			inputGrid(h,w) = rand()%2;
+			// inputGrid(h,w) = h*width+w;
 	    // printf("inputGrid(%d,%d) = %d;\n", h, w, inputGrid(h,w));
       outputGrid(h,w) = rand()%2;
 		}
 	}
-	inputGrid(0,0) = 1;
 
-	// for(int h=0;h<height;h++) {
-	// 	for(int w=0;w<width;w++) {
-	// 	  printf("inputGrid(%d,%d) = %d;\n", h, w, inputGrid(h,w));
-	// 	}
-	// }
+	for(int h=0;h<height;h++) {
+		for(int w=0;w<width;w++) {
+		  printf("inputGrid(%d,%d) = %d;\n", h, w, inputGrid(h,w));
+		}
+	}
 	// for(int h=0;h<height;h++) {
 	// 	for(int w=0;w<width;w++) {
  //      printf("outputGrid(%d,%d) = %d;\n", h, w, outputGrid(h,w));
@@ -91,16 +91,20 @@ int main(int argc, char **argv){
 	//struct timeval end=mppa_master_get_time();
 	//cout<<"Master Time: " << mppa_master_diff_time(start,end) << endl;
 
-	// for(int h=0;h<height;h++) {
-	// 	for(int w=0;w<width;w++) {
-		  printf("inputGrid(%d,%d) = %d;\n", 0, 1, inputGrid(0,1));
-	// 	}
-	// }
-	// for(int h=0;h<height;h++) {
-	// 	for(int w=0;w<width;w++) {
- //      printf("outputGrid(%d,%d) = %d;\n", h, w, outputGrid(h,w));
-	// 	}
-	// }
+
+	for(int h=0;h<height;h++) {
+		for(int w=0;w<width;w++) {
+      printf("outputGrid(%d,%d) = %d;\n", h, w, outputGrid(h,w));
+		}
+	}
+
+		for(int h=0;h<height;h++) {
+		for(int w=0;w<width;w++) {
+      printf("inputGrid(%d,%d) = %d;\n", h, w, inputGrid(h,w));
+		}
+	}
+
+
 
 	exit(0);
 }
