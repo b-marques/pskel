@@ -107,6 +107,8 @@ protected:
          * \param[in] depth Depth for the 3D array being created.
          **/
 	ArrayBase(size_t width, size_t height, size_t depth);
+
+  ArrayBase(size_t width, size_t height, size_t depth, size_t halo_zone);
 public:
 	#ifdef PSKEL_CUDA
 	/**
@@ -155,6 +157,43 @@ public:
 	 * \return the "virtual" depth of the array data structure.
 	 **/
 	__device__ __host__ size_t getDepth() const;
+
+  /**
+   * Get the width size of the core array.
+   * \return the core width of the array data structure.
+   **/
+  __device__ __host__ size_t getRealWidth() const;
+
+  /**
+   * Get the height size of the core array.
+   * \return the core height of the array data structure.
+   **/
+  __device__ __host__ size_t getRealHeight() const;
+
+  /**
+   * Get the depth size of the core array.
+   * \return the core depth of the array data structure.
+   **/
+  __device__ __host__ size_t getRealDepth() const;
+
+
+  /**
+   * Get the width offset size of the "virtual" array.
+   * \return the width offset of the array data structure.
+   **/
+  __device__ __host__ size_t getWidthOffset() const;
+
+  /**
+   * Get the height offset size of the "virtual" array.
+   * \return the height offset of the array data structure.
+   **/
+  __device__ __host__ size_t getHeightOffset() const;
+
+  /**
+   * Get the depth offset size of the "virtual" array.
+   * \return the depth offset of the array data structure.
+   **/
+  __device__ __host__ size_t getDepthOffset() const;
 
 	/**
 	 * Get the size, in bytes, of the allocated memory for the "virtual" array.
@@ -344,6 +383,8 @@ public:
          * \param[in] height height for the 2D array being created.
          **/
 	Array2D(size_t width, size_t height);
+
+  Array2D(size_t width, size_t height, size_t halo_zone);
 
 	/**
          * Access a specific element of the array allocated in the memory space

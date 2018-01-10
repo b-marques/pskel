@@ -327,7 +327,7 @@ public:
 	* \param[in] nb_threads the number of threads for the kernel execution.
 	* \param[in] nb_tiles the number of tiles for the cluster to execute.
 	**/
-	void runMPPA(int cluster_id, int nb_threads, int nb_tiles, int outterIterations, int itMod, int nb_clusters, int width, int height);
+	void runMPPA(int cluster_id, int nb_threads, int nb_tiles, int outterIterations, int innerIterations, int itMod, int nb_clusters, int width, int height, int nb_computated_tiles);
 	#endif
 
 	#ifdef PSKEL_MPPA

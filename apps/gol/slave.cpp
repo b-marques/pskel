@@ -28,13 +28,15 @@ struct Arguments
 namespace PSkel{
 __parallel__ void stencilKernel(Array2D<int> input, Array2D<int> output,
     Mask2D<int> mask, Arguments args, size_t i, size_t j){
-    // int neighbors =  input(i-1,j-1) + input(i-1,j) + input(i-1,j+1)  +
-    //                 input(i+1,j-1) + input(i+1,j) + input(i+1,j+1)  +
-    //                 input(i,j-1)   + input(i,j+1) ;
+    int neighbors =  input(i-1,j-1) + input(i-1,j) + input(i-1,j+1)  +
+                    input(i+1,j-1) + input(i+1,j) + input(i+1,j+1)  +
+                    input(i,j-1)   + input(i,j+1) ;
+
+
     bool central = input(i,j);
-    int neighbors = mask.get(0,input,i,j) + mask.get(1,input,i,j) + mask.get(2,input,i,j) +
-                   mask.get(3,input,i,j) + mask.get(4,input,i,j) + mask.get(5,input,i,j) +
-             mask.get(6,input,i,j) + mask.get(7,input,i,j);
+    // int neighbors = mask.get(0,input,i,j) + mask.get(1,input,i,j) + mask.get(2,input,i,j) +
+    //                mask.get(3,input,i,j) + mask.get(4,input,i,j) + mask.get(5,input,i,j) +
+    //          mask.get(6,input,i,j) + mask.get(7,input,i,j);
     
     
 
@@ -72,7 +74,10 @@ __parallel__ void stencilKernel(Array2D<int> input, Array2D<int> output,
   //                    input(i,j-1)   + input(i,j+1) ;
   //   }
   //
-    output(i,j) = (neighbors == 3 || (neighbors == 2 && central))?1:0;
+   
+   output(i,j) = (neighbors == 3 || (neighbors == 2 && central))?1:0;
+
+  // output(i,j) = input(i,j);
   }
 }
 
@@ -101,18 +106,21 @@ int main(int argc,char **argv) {
   int tilling_height = atoi(argv[2]);
   int cluster_id = atoi(argv[3]);
   int nb_threads = atoi(argv[4]);
-  // int iterations = atoi(argv[5]);
+  int iterations = atoi(argv[5]);
   int outteriterations = atoi(argv[6]);
   int itMod = atoi(argv[7]);
   int nb_clusters = atoi(argv[8]);
   int width = atoi(argv[9]);
   int height = atoi(argv[10]);
+  int nb_computated_tiles = atoi(argv[11]);
 
-  Array2D<int> partInput(tilling_width, tilling_height);
-  Array2D<int> output(tilling_width, tilling_height);
+  int halo_value = mask.getRange() * iterations;
+
+  Array2D<int> partInput(tilling_width, tilling_height, halo_value);
+  Array2D<int> output(tilling_width, tilling_height, halo_value);
   Stencil2D<Array2D<int>, Mask2D<int>, Arguments> stencil(partInput, output, mask, arg);
   // if(iterations == 0)  {
-  stencil.runMPPA(cluster_id, nb_threads, nb_tiles, outteriterations, itMod, nb_clusters, width, height);
+  stencil.runMPPA(cluster_id, nb_threads, nb_tiles, outteriterations, iterations, itMod, nb_clusters, width, height, nb_computated_tiles);
   // } else {
   //      stencil.runIterativeMPPA(cluster_id, nb_threads, nb_tiles, iterations);
   //}

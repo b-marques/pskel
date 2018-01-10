@@ -82,6 +82,39 @@ void ArrayBase<T>::deviceAlloc(){
 }
 #endif
 
+template<typename T>
+ArrayBase<T>::ArrayBase(size_t width, size_t height, size_t depth, size_t halo_zone){
+	this->width = width + halo_zone*2;
+	this->height = height + halo_zone*2;
+	this->depth = depth + halo_zone*2;
+	this->realWidth = width;
+	this->realHeight = height;
+	this->realDepth = depth;
+	this->widthOffset = halo_zone;
+	this->heightOffset = halo_zone;
+	this->depthOffset = halo_zone;
+	this->hostArray = 0;
+	#ifdef PSKEL_CUDA
+		this->deviceArray = 0;
+	#endif
+	#ifdef PSKEL_MPPA
+	this->mppaArray = 0;
+	if(size()>0) this->mppaAlloc();
+	#else
+		if(size()>0) this->hostAlloc();
+	#endif
+}
+
+#ifdef PSKEL_CUDA
+template<typename T>
+void ArrayBase<T>::deviceAlloc(){
+	if(this->deviceArray==NULL){
+		gpuErrchk( cudaMalloc((void **) &deviceArray, size()*sizeof(T)) );
+		cudaMemset(this->deviceArray, 0, size()*sizeof(T));
+	}
+}
+#endif
+
 #ifdef PSKEL_CUDA
 template<typename T>
 void ArrayBase<T>::deviceFree(){
@@ -198,6 +231,36 @@ size_t ArrayBase<T>::getDepth() const{
 }
 
 template<typename T>
+size_t ArrayBase<T>::getRealWidth() const{
+	return realWidth;
+}
+
+template<typename T>
+size_t ArrayBase<T>::getRealHeight() const{
+	return realHeight;
+}
+
+template<typename T>
+size_t ArrayBase<T>::getRealDepth() const{
+	return realDepth;
+}
+
+template<typename T>
+size_t ArrayBase<T>::getWidthOffset() const{
+	return widthOffset;
+}
+
+template<typename T>
+size_t ArrayBase<T>::getHeightOffset() const{
+	return heightOffset;
+}
+
+template<typename T>
+size_t ArrayBase<T>::getDepthOffset() const{
+	return depthOffset;
+}
+
+template<typename T>
 size_t ArrayBase<T>::memSize() const{
 	return size()*sizeof(T);
 }
@@ -227,9 +290,11 @@ T & ArrayBase<T>::hostGet(size_t h, size_t w, size_t d) const {
 #ifdef PSKEL_MPPA
 template<typename T>
 T& ArrayBase<T>::mppaGet(size_t h, size_t w, size_t d) const {
-	return this->mppaArray[ ((h+heightOffset)*realWidth + (w+widthOffset))*realDepth + (d+depthOffset) ];
+	return this->mppaArray[ h * width + w];
 }
 #endif
+
+#include<string>
 
 #ifdef PSKEL_MPPA
 template<typename T>
@@ -249,10 +314,25 @@ void ArrayBase<T>::mppa_get_block2d(const mppa_async_point2d_t *remote_point) {
 																 remote_point,
 																 NULL) == 0);
 
-	// assert(mppa_async_get_spaced(this->mppaArray,
-	// 														 &(this->mppa_segment),
-	// 														 0, sizeof(T)*3, this->height, 48*sizeof(T),
-	// 														 NULL) == 0);
+	// int id = __k1_get_cluster_id();
+	// char ssid[5];
+	// sprintf(ssid, "%d", id);
+	// std::string sid(ssid);
+	// std::string grid;
+
+ //  for(unsigned h=0;h<this->height; h++) {
+ //  		grid+="inputGrid-slave["+sid+"] = ";
+ //      for(unsigned w=0;w<this->width; w++) {
+ //      	int element = mppaArray[h*width + w];
+	// 			char celement[5];
+	// 			sprintf(celement, "%d", element);
+	// 			std::string selement(celement);
+ //      	grid+= " " + selement;
+ //      }
+ //      grid += "\n";
+ //  }
+ //  std::cout << grid << std::endl;
+
 }
 #endif
 
@@ -261,17 +341,40 @@ template<typename T>
 void ArrayBase<T>::mppa_put_block2d(const mppa_async_point2d_t *remote_point) {
 
   mppa_async_point2d_t local_point = {
-    0, 												// xpos
-    0,                        // ypos
+    0 + (int)widthOffset, 												// xpos
+    0 + (int)heightOffset,                        // ypos
     (int)this->width,              // xdim
     (int)this->height,             // ydim
   };
+
+  // printf("remote_point:\n%d\n%d\n%d\n%d\n", remote_point->xpos, remote_point->ypos, remote_point->xdim, remote_point->ydim);
+  // printf("local_point:\n%d\n%d\n%d\n%d\n", local_point.xpos, local_point.ypos, local_point.xdim, local_point.ydim);
+
 	assert(mppa_async_sput_block2d(this->mppaArray, 
 																 &(this->mppa_segment),
-																 0, sizeof(T), this->width, this->height,
+																 0, sizeof(T), this->realWidth, this->realHeight,
 																 &local_point,
 																 remote_point,
 																 NULL) == 0);
+
+	// int id = __k1_get_cluster_id();
+	// char ssid[5];
+	// sprintf(ssid, "%d", id);
+	// std::string sid(ssid);
+	// std::string grid;
+
+ //  for(unsigned h=0;h<this->height; h++) {
+ //  		grid+="outputGrid-slave["+sid+"] = ";
+ //      for(unsigned w=0;w<this->width; w++) {
+ //      	int element = mppaArray[h*width + w];
+	// 			char celement[5];
+	// 			sprintf(celement, "%d", element);
+	// 			std::string selement(celement);
+ //      	grid+= " " + selement;
+ //      }
+ //      grid += "\n";
+ //  }
+ //  std::cout << grid << std::endl;
 }
 #endif
 
@@ -579,6 +682,9 @@ Array2D<T>::Array2D() : ArrayBase<T>(0,0,0) {}
 
 template<typename T>
 Array2D<T>::Array2D(size_t width, size_t height) : ArrayBase<T>(width,height,1){}
+
+template<typename T>
+Array2D<T>::Array2D(size_t width, size_t height, size_t halo_zone) : ArrayBase<T>(width,height,1,halo_zone){}
 
 template<typename T>
 T & Array2D<T>::operator()(size_t h, size_t w) const {

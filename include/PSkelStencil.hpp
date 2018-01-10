@@ -50,7 +50,7 @@ using namespace std;
 #include <ga/std_stream.h>
 #endif
 
-#define ARGC_SLAVE 12
+#define ARGC_SLAVE 13
 
 namespace PSkel{
 
@@ -192,8 +192,8 @@ namespace PSkel{
             // Prepare arguments to send to slaves
             int cluster_id;
             
-            size_t w_tiling = ceil(float(this->input.getWidth())/float(tiling_width));
-            size_t h_tiling = ceil(float(this->input.getHeight())/float(tiling_height));
+            size_t w_tiling = ceil(float(this->input.getRealWidth())/float(tiling_width));
+            size_t h_tiling = ceil(float(this->input.getRealHeight())/float(tiling_height));
             size_t total_size = float(h_tiling*w_tiling);
 
             int tiles = total_size/nb_clusters;
@@ -206,7 +206,7 @@ namespace PSkel{
 
 
 #ifdef DEBUG
-            cout<<"MASTER: width="<<this->input.getWidth()<<" height="<<this->input.getWidth();
+            cout<<"MASTER: width="<<this->input.getWidth()<<" height="<<this->input.getHeight();
             cout<<" tiling_height="<<tiling_height <<" iterations="<<iterations;
             cout<<" inner_iterations="<<inner_iterations<<" nbclusters="<<nb_clusters<<" nbthreads="<<nb_threads<<endl;
             cout<<"MASTER: tiles="<<tiles<<" itMod="<<it_mod<<" outterIterations="<<outter_iterations<<endl;
@@ -226,11 +226,12 @@ namespace PSkel{
             sprintf(argv_slave[8], "%d", nb_clusters);
             sprintf(argv_slave[9], "%d", width);
             sprintf(argv_slave[10], "%d", height);
-            argv_slave[11] = NULL;
+            argv_slave[12] = NULL;
 
 
             this->mppa_init_io_cluster(nb_clusters, pcie_fd);
 
+            int nb_computated_tiles = 0;
             // Spawn slave processes
             for (cluster_id = 0; cluster_id < nb_clusters && cluster_id < (int)total_size; cluster_id++) {
                 r = (cluster_id < it_mod)?1:0;
@@ -238,6 +239,10 @@ namespace PSkel{
 
                 sprintf(argv_slave[0], "%d", tiles_slave);
                 sprintf(argv_slave[3], "%d", cluster_id);
+                sprintf(argv_slave[11], "%d", nb_computated_tiles);
+                
+                nb_computated_tiles += tiles_slave;
+
                 if (mppa_power_base_spawn(cluster_id, slave_bin_name, (const char **)argv_slave, NULL, MPPA_POWER_SHUFFLING_ENABLED) == -1)
                     printf("# [IODDR0] Fail to Spawn cluster %d\n", cluster_id);
             }
@@ -299,7 +304,7 @@ namespace PSkel{
 
 #ifdef MPPA_SLAVE
     template<class Array, class Mask, class Args>
-        void StencilBase<Array, Mask,Args>::runMPPA(int cluster_id, int nb_threads, int nb_tiles, int outterIterations, int itMod, int nb_clusters, int width, int height){
+        void StencilBase<Array, Mask,Args>::runMPPA(int cluster_id, int nb_threads, int nb_tiles, int outterIterations, int innerIterations, int itMod, int nb_clusters, int width, int height, int nb_computated_tiles){
             // Array finalArr;
             // Array coreTmp;
             // Array tmp;
@@ -403,37 +408,53 @@ namespace PSkel{
             mppa_async_init();
             mppa_remote_client_init();
 
-
-
             this->input.mppa_segment_clone(1);
 
-            for (int i = 0; i < height; i+=this->input.getHeight()){
-                
-                mppa_async_point2d_t remote_point = {
-                    (int)this->input.getWidth() * cluster_id, // xpos
-                    i,                                   // ypos
-                    width,              // xdim
-                    height              // ydim
-                };
+            // printf("NB_TILES[%d](%d)\n", cluster_id, nb_tiles);
 
+            /* number of tiles in x axis */
+            int w_tiling = ceil(float(width)/float(this->input.getRealWidth()));
 
-                this->input.mppa_get_block2d(&remote_point);
-
-                // if(cluster_id == 0) {
-                //     for(unsigned h=0;h<this->input.getHeight();h++) {
-                //         for(unsigned w=0;w<this->input.getWidth();w++) {
-                //           printf("inputGrid-slave(%d,%d) = %d;\n", h, w, this->input(h,w));
-                //         }
-                //     }
-                // }
-
-                this->runIterativeMPPA(this->input, this->output, 1 /*nb_iterations*/, nb_threads);
-
-                this->output.mppa_segment_clone(2);
-                this->output.mppa_put_block2d(&remote_point);
-            }
+            /* starting point in x axis */
+            int width_offset = (nb_computated_tiles % w_tiling) * (int)this->input.getRealWidth();
             
-            mppa_rpc_barrier_all();
+            /* startig point in y axis */
+            int height_offset = floor(float(nb_computated_tiles)/float(w_tiling)) * (int)this->input.getRealHeight();
+
+            int nb_tiles_aux = nb_tiles;
+            int j = width_offset;
+            for(int i = height_offset; i < height && nb_tiles_aux; i+=this->input.getRealHeight()){
+                for(; j < width && nb_tiles_aux; j+=this->input.getRealWidth()){
+                    
+                    mppa_async_point2d_t remote_point = {
+                        j, // xpos
+                        i,                                     // ypos
+                        width + (int)this->input.getWidthOffset()*2,  // xdim
+                        height + (int)this->input.getHeightOffset()*2,                 // ydim
+                    };
+
+                    // printf("remote_point:\n%d\n%d\n%d\n%d\n", remote_point.xpos, remote_point.ypos, remote_point.xdim, remote_point.ydim);
+                    
+                    this->input.mppa_get_block2d(&remote_point);
+
+                    // if(cluster_id == 0) {
+                    //     for(unsigned h=0;h<this->input.getHeight();h++) {
+                    //         for(unsigned w=0;w<this->input.getWidth();w++) {
+                    //           printf("inputGrid-slave(%d,%d) = %d;\n", h, w, this->input(h,w));
+                    //         }
+                    //     }
+                    // }
+
+                    this->runIterativeMPPA(this->input, this->output, 1 /*nb_iterations*/, nb_threads);
+
+                    this->output.mppa_segment_clone(2);
+                    remote_point.xpos += (int)this->output.getWidthOffset();
+                    remote_point.ypos += (int)this->output.getHeightOffset();
+                    this->output.mppa_put_block2d(&remote_point);
+                    --nb_tiles_aux;
+                }
+                j = 0; /* "reset" ypos */
+            }
           
             mppa_async_final();
         }
@@ -1128,12 +1149,11 @@ namespace PSkel{
 #ifndef MPPA_MASTER
     template<class Array, class Mask, class Args>
         void Stencil3D<Array,Mask,Args>::runOpenMP(Array in, Array out, size_t numThreads){
-            printf("teste");
             omp_set_num_threads(numThreads);
 #pragma omp parallel for
-            for (int h = 0; h < in.getHeight(); h++){
-                for (int w = 0; w < in.getWidth(); w++){
-                    for (int d = 0; d < in.getDepth(); d++){
+            for (int h = 0 + in.getHeightOffset(); h < in.getHeight() - in.getHeightOffset(); h++){
+                for (int w = 0 + in.getWidthOffset(); w < in.getWidth() - in.getWidthOffset(); w++){
+                    for (int d = 0 + in.getDepthOffset(); d < in.getDepth() - in.getDepthOffset(); d++){
                         stencilKernel(in,out,this->mask,this->args,h,w,d);
                     }}}
         }
