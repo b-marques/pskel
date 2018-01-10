@@ -47,25 +47,12 @@ output/build/cluster_bin_build/slave.cpp.o: slave.cpp \
  /usr/local/k1tools/k1-nodeos/include/stdlib.h \
  /usr/local/k1tools/k1-nodeos/include/machine/stdlib.h \
  /usr/local/k1tools/k1-nodeos/include/unistd.h \
- /usr/local/k1tools/k1-nodeos/include/sys/unistd.h ../../include/PSkel.h \
- /usr/local/k1tools/k1-nodeos/include/c++/4.9.3/cstdio \
+ /usr/local/k1tools/k1-nodeos/include/sys/unistd.h \
+ ../../include/mppa_utils.h \
+ /usr/local/k1tools/k1-nodeos/include/c++/4.9.3/iostream \
  /usr/local/k1tools/k1-nodeos/include/c++/4.9.3/k1-nodeos/mOS/bits/c++config.h \
  /usr/local/k1tools/k1-nodeos/include/c++/4.9.3/k1-nodeos/mOS/bits/os_defines.h \
  /usr/local/k1tools/k1-nodeos/include/c++/4.9.3/k1-nodeos/mOS/bits/cpu_defines.h \
- /usr/local/k1tools/k1-nodeos/include/time.h \
- /usr/local/k1tools/k1-nodeos/include/machine/time.h \
- /usr/local/k1tools/k1-nodeos/include/HAL/hal/core/cpu.h \
- /usr/local/k1tools/k1-nodeos/include/HAL/machine/k1b/core/k1bdp/cpu.h \
- /usr/local/k1tools/k1-nodeos/include/signal.h \
- /usr/local/k1tools/k1-nodeos/include/sys/signal.h \
- /usr/local/k1tools/k1-nodeos/include/c++/4.9.3/typeinfo \
- /usr/local/k1tools/k1-nodeos/include/c++/4.9.3/exception \
- /usr/local/k1tools/k1-nodeos/include/c++/4.9.3/bits/atomic_lockfree_defines.h \
- /usr/local/k1tools/k1-nodeos/include/c++/4.9.3/bits/exception_ptr.h \
- /usr/local/k1tools/k1-nodeos/include/c++/4.9.3/bits/exception_defines.h \
- /usr/local/k1tools/k1-nodeos/include/c++/4.9.3/bits/nested_exception.h \
- /usr/local/k1tools/k1-nodeos/include/c++/4.9.3/bits/hash_bytes.h \
- /usr/local/k1tools/k1-nodeos/include/c++/4.9.3/iostream \
  /usr/local/k1tools/k1-nodeos/include/c++/4.9.3/ostream \
  /usr/local/k1tools/k1-nodeos/include/c++/4.9.3/ios \
  /usr/local/k1tools/k1-nodeos/include/c++/4.9.3/iosfwd \
@@ -74,6 +61,11 @@ output/build/cluster_bin_build/slave.cpp.o: slave.cpp \
  /usr/local/k1tools/k1-nodeos/include/c++/4.9.3/bits/postypes.h \
  /usr/local/k1tools/k1-nodeos/include/c++/4.9.3/cwchar \
  /usr/local/k1tools/k1-nodeos/include/wchar.h \
+ /usr/local/k1tools/k1-nodeos/include/c++/4.9.3/exception \
+ /usr/local/k1tools/k1-nodeos/include/c++/4.9.3/bits/atomic_lockfree_defines.h \
+ /usr/local/k1tools/k1-nodeos/include/c++/4.9.3/bits/exception_ptr.h \
+ /usr/local/k1tools/k1-nodeos/include/c++/4.9.3/bits/exception_defines.h \
+ /usr/local/k1tools/k1-nodeos/include/c++/4.9.3/bits/nested_exception.h \
  /usr/local/k1tools/k1-nodeos/include/c++/4.9.3/bits/char_traits.h \
  /usr/local/k1tools/k1-nodeos/include/c++/4.9.3/bits/stl_algobase.h \
  /usr/local/k1tools/k1-nodeos/include/c++/4.9.3/bits/functexcept.h \
@@ -103,6 +95,12 @@ output/build/cluster_bin_build/slave.cpp.o: slave.cpp \
  /usr/local/k1tools/k1-nodeos/include/c++/4.9.3/k1-nodeos/mOS/bits/gthr.h \
  /usr/local/k1tools/k1-nodeos/include/c++/4.9.3/k1-nodeos/mOS/bits/gthr-default.h \
  /usr/local/k1tools/k1-nodeos/include/pthread.h \
+ /usr/local/k1tools/k1-nodeos/include/time.h \
+ /usr/local/k1tools/k1-nodeos/include/machine/time.h \
+ /usr/local/k1tools/k1-nodeos/include/HAL/hal/core/cpu.h \
+ /usr/local/k1tools/k1-nodeos/include/HAL/machine/k1b/core/k1bdp/cpu.h \
+ /usr/local/k1tools/k1-nodeos/include/signal.h \
+ /usr/local/k1tools/k1-nodeos/include/sys/signal.h \
  /usr/local/k1tools/k1-nodeos/include/sys/pthread_cleanup.h \
  /usr/local/k1tools/k1-nodeos/include/sched.h \
  /usr/local/k1tools/k1-nodeos/include/c++/4.9.3/k1-nodeos/mOS/bits/atomic_word.h \
@@ -121,6 +119,7 @@ output/build/cluster_bin_build/slave.cpp.o: slave.cpp \
  /usr/local/k1tools/k1-nodeos/include/c++/4.9.3/bits/basic_string.h \
  /usr/local/k1tools/k1-nodeos/include/c++/4.9.3/initializer_list \
  /usr/local/k1tools/k1-nodeos/include/c++/4.9.3/bits/functional_hash.h \
+ /usr/local/k1tools/k1-nodeos/include/c++/4.9.3/bits/hash_bytes.h \
  /usr/local/k1tools/k1-nodeos/include/c++/4.9.3/bits/basic_string.tcc \
  /usr/local/k1tools/k1-nodeos/include/c++/4.9.3/bits/locale_classes.tcc \
  /usr/local/k1tools/k1-nodeos/include/c++/4.9.3/streambuf \
@@ -137,6 +136,14 @@ output/build/cluster_bin_build/slave.cpp.o: slave.cpp \
  /usr/local/k1tools/k1-nodeos/include/c++/4.9.3/bits/ostream.tcc \
  /usr/local/k1tools/k1-nodeos/include/c++/4.9.3/istream \
  /usr/local/k1tools/k1-nodeos/include/c++/4.9.3/bits/istream.tcc \
+ /usr/local/k1tools/k1-nodeos/include/c++/4.9.3/chrono \
+ /usr/local/k1tools/k1-nodeos/include/c++/4.9.3/ratio \
+ /usr/local/k1tools/k1-nodeos/include/c++/4.9.3/limits \
+ /usr/local/k1tools/k1-nodeos/include/c++/4.9.3/ctime \
+ /usr/local/k1tools/k1-nodeos/include/c++/4.9.3/bits/parse_numbers.h \
+ ../../include/PSkel.h \
+ /usr/local/k1tools/k1-nodeos/include/c++/4.9.3/cstdio \
+ /usr/local/k1tools/k1-nodeos/include/c++/4.9.3/typeinfo \
  /usr/local/k1tools/lib/gcc/k1-nodeos/4.9.3/include/omp.h \
  ../../include/PSkelDefs.h ../../include/PSkelArray.h \
  ../../include/common.h /usr/local/k1tools/k1-nodeos/include/mppa_async.h \
@@ -297,7 +304,6 @@ output/build/cluster_bin_build/slave.cpp.o: slave.cpp \
  /usr/local/k1tools/k1-nodeos/include/c++/4.9.3/ext/alloc_traits.h \
  /usr/local/k1tools/k1-nodeos/include/c++/4.9.3/bits/alloc_traits.h \
  /usr/local/k1tools/k1-nodeos/include/c++/4.9.3/random \
- /usr/local/k1tools/k1-nodeos/include/c++/4.9.3/limits \
  /usr/local/k1tools/k1-nodeos/include/c++/4.9.3/bits/random.h \
  /usr/local/k1tools/k1-nodeos/include/c++/4.9.3/vector \
  /usr/local/k1tools/k1-nodeos/include/c++/4.9.3/bits/stl_uninitialized.h \
@@ -407,43 +413,15 @@ output/build/cluster_bin_build/slave.cpp.o: slave.cpp \
 
 /usr/local/k1tools/k1-nodeos/include/sys/unistd.h:
 
-../../include/PSkel.h:
+../../include/mppa_utils.h:
 
-/usr/local/k1tools/k1-nodeos/include/c++/4.9.3/cstdio:
+/usr/local/k1tools/k1-nodeos/include/c++/4.9.3/iostream:
 
 /usr/local/k1tools/k1-nodeos/include/c++/4.9.3/k1-nodeos/mOS/bits/c++config.h:
 
 /usr/local/k1tools/k1-nodeos/include/c++/4.9.3/k1-nodeos/mOS/bits/os_defines.h:
 
 /usr/local/k1tools/k1-nodeos/include/c++/4.9.3/k1-nodeos/mOS/bits/cpu_defines.h:
-
-/usr/local/k1tools/k1-nodeos/include/time.h:
-
-/usr/local/k1tools/k1-nodeos/include/machine/time.h:
-
-/usr/local/k1tools/k1-nodeos/include/HAL/hal/core/cpu.h:
-
-/usr/local/k1tools/k1-nodeos/include/HAL/machine/k1b/core/k1bdp/cpu.h:
-
-/usr/local/k1tools/k1-nodeos/include/signal.h:
-
-/usr/local/k1tools/k1-nodeos/include/sys/signal.h:
-
-/usr/local/k1tools/k1-nodeos/include/c++/4.9.3/typeinfo:
-
-/usr/local/k1tools/k1-nodeos/include/c++/4.9.3/exception:
-
-/usr/local/k1tools/k1-nodeos/include/c++/4.9.3/bits/atomic_lockfree_defines.h:
-
-/usr/local/k1tools/k1-nodeos/include/c++/4.9.3/bits/exception_ptr.h:
-
-/usr/local/k1tools/k1-nodeos/include/c++/4.9.3/bits/exception_defines.h:
-
-/usr/local/k1tools/k1-nodeos/include/c++/4.9.3/bits/nested_exception.h:
-
-/usr/local/k1tools/k1-nodeos/include/c++/4.9.3/bits/hash_bytes.h:
-
-/usr/local/k1tools/k1-nodeos/include/c++/4.9.3/iostream:
 
 /usr/local/k1tools/k1-nodeos/include/c++/4.9.3/ostream:
 
@@ -460,6 +438,16 @@ output/build/cluster_bin_build/slave.cpp.o: slave.cpp \
 /usr/local/k1tools/k1-nodeos/include/c++/4.9.3/cwchar:
 
 /usr/local/k1tools/k1-nodeos/include/wchar.h:
+
+/usr/local/k1tools/k1-nodeos/include/c++/4.9.3/exception:
+
+/usr/local/k1tools/k1-nodeos/include/c++/4.9.3/bits/atomic_lockfree_defines.h:
+
+/usr/local/k1tools/k1-nodeos/include/c++/4.9.3/bits/exception_ptr.h:
+
+/usr/local/k1tools/k1-nodeos/include/c++/4.9.3/bits/exception_defines.h:
+
+/usr/local/k1tools/k1-nodeos/include/c++/4.9.3/bits/nested_exception.h:
 
 /usr/local/k1tools/k1-nodeos/include/c++/4.9.3/bits/char_traits.h:
 
@@ -519,6 +507,18 @@ output/build/cluster_bin_build/slave.cpp.o: slave.cpp \
 
 /usr/local/k1tools/k1-nodeos/include/pthread.h:
 
+/usr/local/k1tools/k1-nodeos/include/time.h:
+
+/usr/local/k1tools/k1-nodeos/include/machine/time.h:
+
+/usr/local/k1tools/k1-nodeos/include/HAL/hal/core/cpu.h:
+
+/usr/local/k1tools/k1-nodeos/include/HAL/machine/k1b/core/k1bdp/cpu.h:
+
+/usr/local/k1tools/k1-nodeos/include/signal.h:
+
+/usr/local/k1tools/k1-nodeos/include/sys/signal.h:
+
 /usr/local/k1tools/k1-nodeos/include/sys/pthread_cleanup.h:
 
 /usr/local/k1tools/k1-nodeos/include/sched.h:
@@ -555,6 +555,8 @@ output/build/cluster_bin_build/slave.cpp.o: slave.cpp \
 
 /usr/local/k1tools/k1-nodeos/include/c++/4.9.3/bits/functional_hash.h:
 
+/usr/local/k1tools/k1-nodeos/include/c++/4.9.3/bits/hash_bytes.h:
+
 /usr/local/k1tools/k1-nodeos/include/c++/4.9.3/bits/basic_string.tcc:
 
 /usr/local/k1tools/k1-nodeos/include/c++/4.9.3/bits/locale_classes.tcc:
@@ -586,6 +588,22 @@ output/build/cluster_bin_build/slave.cpp.o: slave.cpp \
 /usr/local/k1tools/k1-nodeos/include/c++/4.9.3/istream:
 
 /usr/local/k1tools/k1-nodeos/include/c++/4.9.3/bits/istream.tcc:
+
+/usr/local/k1tools/k1-nodeos/include/c++/4.9.3/chrono:
+
+/usr/local/k1tools/k1-nodeos/include/c++/4.9.3/ratio:
+
+/usr/local/k1tools/k1-nodeos/include/c++/4.9.3/limits:
+
+/usr/local/k1tools/k1-nodeos/include/c++/4.9.3/ctime:
+
+/usr/local/k1tools/k1-nodeos/include/c++/4.9.3/bits/parse_numbers.h:
+
+../../include/PSkel.h:
+
+/usr/local/k1tools/k1-nodeos/include/c++/4.9.3/cstdio:
+
+/usr/local/k1tools/k1-nodeos/include/c++/4.9.3/typeinfo:
 
 /usr/local/k1tools/lib/gcc/k1-nodeos/4.9.3/include/omp.h:
 
@@ -914,8 +932,6 @@ output/build/cluster_bin_build/slave.cpp.o: slave.cpp \
 /usr/local/k1tools/k1-nodeos/include/c++/4.9.3/bits/alloc_traits.h:
 
 /usr/local/k1tools/k1-nodeos/include/c++/4.9.3/random:
-
-/usr/local/k1tools/k1-nodeos/include/c++/4.9.3/limits:
 
 /usr/local/k1tools/k1-nodeos/include/c++/4.9.3/bits/random.h:
 

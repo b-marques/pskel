@@ -14,6 +14,7 @@
 // #define TIME_EXEC
 // #define TIME_SEND
 #include "../../include/PSkel.h"
+#include "../../include/mppa_utils.h"
 
 using namespace std;
 using namespace PSkel;
@@ -94,53 +95,40 @@ int main(int argc, char **argv){
 	// 	}
 	// }
 
-	std::string grid;
-  for(int h = 0; h < height + halo_value*2; h++) {
-    for(int w = 0 ; w < width + halo_value*2;  w++) {
-    	int element = inputGrid(h,w);
-			char celement[10];
-			sprintf(celement, " %d", element);
-    	grid+= celement;
-    }
-    grid += "\n";
-	}
-	std::cout << grid << std::endl;
+//	std::string grid;
+//  for(int h = 0; h < height + halo_value*2; h++) {
+//    for(int w = 0 ; w < width + halo_value*2;  w++) {
+//    	int element = inputGrid(h,w);
+//			char celement[10];
+//			sprintf(celement, " %d", element);
+//    	grid+= celement;
+//    }
+//    grid += "\n";
+//	}
+//	std::cout << grid << std::endl;
 
 	//Instantiate Stencil 2D
 	Stencil2D<Array2D<int>, Mask2D<int>, Arguments> stencil(inputGrid, outputGrid, mask);
-	//struct timeval start = mppa_master_get_time();
+	
+//	std::chrono::time_point<std::chrono::steady_clock> start = mppa_master_get_time();
 
 	//Schedule computation to slaves
 	stencil.scheduleMPPA("cluster_bin", nb_clusters, nb_threads, width, height, tilingHeight, tilingWidth, iterations, innerIterations);
 
-	//struct timeval end=mppa_master_get_time();
-	//cout<<"Master Time: " << mppa_master_diff_time(start,end) << endl;
+//	std::chrono::time_point<std::chrono::steady_clock> end = mppa_master_get_time();
+//	cout<<"Master Time: " << mppa_master_diff_time(start,end) << endl;
 
-
-	// for(int h=0;h<height;h++) {
-	// 	for(int w=0;w<width;w++) {
- //      printf("outputGrid(%d,%d) = %d;\n", h, w, outputGrid(h,w));
-	// 	}
-	// }
-
-	// 	for(int h=0;h<height;h++) {
-	// 	for(int w=0;w<width;w++) {
- //      printf("inputGrid(%d,%d) = %d;\n", h, w, inputGrid(h,w));
-	// 	}
-	// }
-
-		grid = "";
-
-	  for(int h=0; h < height + halo_value*2; h++) {
-      for(int w=0; w < width + halo_value*2; w++) {
-      	int element = outputGrid(h,w);
-				char celement[10];
-				sprintf(celement, " %d", element);
-      	grid+= celement;
-      }
-      grid += "\n";
-  }
-  std::cout << grid << std::endl;
+//	grid = "";
+//  for(int h=0; h < height + halo_value*2; h++) {
+//    for(int w=0; w < width + halo_value*2; w++) {
+//    	int element = outputGrid(h,w);
+//			char celement[10];
+//			sprintf(celement, " %d", element);
+//    	grid+= celement;
+//    }
+//    grid += "\n";
+//  }
+//  std::cout << grid << std::endl;
 
 
 

@@ -408,10 +408,15 @@ namespace PSkel{
             mppa_async_init();
             mppa_remote_client_init();
 
+            double exec_time = 0;
+            double comm_time = 0;
+
+            std::chrono::time_point<std::chrono::steady_clock> begin_exec = mppa_slave_get_time();
+            
+            std::chrono::time_point<std::chrono::steady_clock> begin_comm = mppa_slave_get_time();
             this->input.mppa_segment_clone(1);
-
-            // printf("NB_TILES[%d](%d)\n", cluster_id, nb_tiles);
-
+            this->output.mppa_segment_clone(2);
+            
             /* number of tiles in x axis */
             int w_tiling = ceil(float(width)/float(this->input.getRealWidth()));
 
@@ -421,21 +426,27 @@ namespace PSkel{
             /* startig point in y axis */
             int height_offset = floor(float(nb_computated_tiles)/float(w_tiling)) * (int)this->input.getRealHeight();
 
+            std::chrono::time_point<std::chrono::steady_clock> end_comm = mppa_slave_get_time();
+            comm_time += mppa_slave_diff_time(begin_comm, end_comm);
+
             int nb_tiles_aux = nb_tiles;
             int j = width_offset;
             for(int i = height_offset; i < height && nb_tiles_aux; i+=this->input.getRealHeight()){
                 for(; j < width && nb_tiles_aux; j+=this->input.getRealWidth()){
                     
+
+                    begin_comm = mppa_slave_get_time();
+
                     mppa_async_point2d_t remote_point = {
                         j, // xpos
                         i,                                     // ypos
                         width + (int)this->input.getWidthOffset()*2,  // xdim
                         height + (int)this->input.getHeightOffset()*2,                 // ydim
                     };
-
                     // printf("remote_point:\n%d\n%d\n%d\n%d\n", remote_point.xpos, remote_point.ypos, remote_point.xdim, remote_point.ydim);
-                    
                     this->input.mppa_get_block2d(&remote_point);
+                    end_comm = mppa_slave_get_time();
+                    comm_time += mppa_slave_diff_time(begin_comm, end_comm);
 
                     // if(cluster_id == 0) {
                     //     for(unsigned h=0;h<this->input.getHeight();h++) {
@@ -446,15 +457,26 @@ namespace PSkel{
                     // }
 
                     this->runIterativeMPPA(this->input, this->output, 1 /*nb_iterations*/, nb_threads);
-
-                    this->output.mppa_segment_clone(2);
+                    
+                    begin_comm = mppa_slave_get_time();
                     remote_point.xpos += (int)this->output.getWidthOffset();
                     remote_point.ypos += (int)this->output.getHeightOffset();
+                    
+                    
                     this->output.mppa_put_block2d(&remote_point);
+                    end_comm = mppa_slave_get_time();
+                    comm_time += mppa_slave_diff_time(begin_comm, end_comm);
+
                     --nb_tiles_aux;
                 }
                 j = 0; /* "reset" ypos */
             }
+
+            std::chrono::time_point<std::chrono::steady_clock> end_exec = mppa_slave_get_time();
+            exec_time = mppa_slave_diff_time(begin_exec, end_exec);
+
+            cout<< "Slave Time: " << exec_time << endl;
+            cout<< "Comm. Time: " << comm_time << endl;
           
             mppa_async_final();
         }

@@ -344,7 +344,12 @@ output/build/io_bin_build/master.cpp.o: master.cpp \
  /usr/local/k1tools/k1-elf/include/c++/4.9.3/k1-elf/k1bio/le/bare/mOS/bits/opt_random.h \
  /usr/local/k1tools/k1-elf/include/c++/4.9.3/bits/random.tcc \
  /usr/local/k1tools/k1-elf/include/c++/4.9.3/numeric \
- /usr/local/k1tools/k1-elf/include/c++/4.9.3/bits/stl_numeric.h
+ /usr/local/k1tools/k1-elf/include/c++/4.9.3/bits/stl_numeric.h \
+ ../../include/mppa_utils.h \
+ /usr/local/k1tools/k1-elf/include/c++/4.9.3/chrono \
+ /usr/local/k1tools/k1-elf/include/c++/4.9.3/ratio \
+ /usr/local/k1tools/k1-elf/include/c++/4.9.3/ctime \
+ /usr/local/k1tools/k1-elf/include/c++/4.9.3/bits/parse_numbers.h
 
 /usr/local/k1tools/k1-elf/include/stdio.h:
 
@@ -1047,3 +1052,13 @@ output/build/io_bin_build/master.cpp.o: master.cpp \
 /usr/local/k1tools/k1-elf/include/c++/4.9.3/numeric:
 
 /usr/local/k1tools/k1-elf/include/c++/4.9.3/bits/stl_numeric.h:
+
+../../include/mppa_utils.h:
+
+/usr/local/k1tools/k1-elf/include/c++/4.9.3/chrono:
+
+/usr/local/k1tools/k1-elf/include/c++/4.9.3/ratio:
+
+/usr/local/k1tools/k1-elf/include/c++/4.9.3/ctime:
+
+/usr/local/k1tools/k1-elf/include/c++/4.9.3/bits/parse_numbers.h:

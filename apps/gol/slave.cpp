@@ -12,7 +12,7 @@
 #define BARRIER_SYNC_MASTER "/mppa/sync/128:1"
 #define BARRIER_SYNC_SLAVE "/mppa/sync/[0..15]:2"
 //#include "common.h"
-//#include "../../include/interface_mppa.h"
+#include "../../include/mppa_utils.h"
 #include "../../include/PSkel.h"
 
 using namespace std;
@@ -120,7 +120,9 @@ int main(int argc,char **argv) {
   Array2D<int> output(tilling_width, tilling_height, halo_value);
   Stencil2D<Array2D<int>, Mask2D<int>, Arguments> stencil(partInput, output, mask, arg);
   // if(iterations == 0)  {
+
   stencil.runMPPA(cluster_id, nb_threads, nb_tiles, outteriterations, iterations, itMod, nb_clusters, width, height, nb_computated_tiles);
+  
   // } else {
   //      stencil.runIterativeMPPA(cluster_id, nb_threads, nb_tiles, iterations);
   //}
