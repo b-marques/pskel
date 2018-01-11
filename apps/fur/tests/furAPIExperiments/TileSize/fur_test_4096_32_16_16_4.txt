@@ -1,0 +1,38 @@
+Cluster2@0.0: PE 0: Slave Time: 0.284285
+Cluster6@0.0: PE 0: Slave Time: 0.284467
+Cluster10@0.0: PE 0: Slave Time: 0.284531
+Cluster2@0.0: PE 0: Comm. Time: 0.021386
+Cluster11@0.0: PE 0: Slave Time: 0.285646
+Cluster7@0.0: PE 0: Slave Time: 0.285655
+Cluster9@0.0: PE 0: Slave Time: 0.284893
+Cluster8@0.0: PE 0: Slave Time: 0.285644
+Cluster3@0.0: PE 0: Slave Time: 0.2854
+Cluster0@0.0: PE 0: Slave Time: 0.285467
+Cluster4@0.0: PE 0: Slave Time: 0.285595
+Cluster12@0.0: PE 0: Slave Time: 0.285637
+Cluster1@0.0: PE 0: Slave Time: 0.284837
+Cluster5@0.0: PE 0: Slave Time: 0.28485
+Cluster6@0.0: PE 0: Comm. Time: 0.021551
+Cluster10@0.0: PE 0: Comm. Time: 0.021638
+Cluster13@0.0: PE 0: Slave Time: 0.284626
+Cluster7@0.0: PE 0: Comm. Time: 0.02271
+Cluster11@0.0: PE 0: Comm. Time: 0.022755
+Cluster9@0.0: PE 0: Comm. Time: 0.021978
+Cluster8@0.0: PE 0: Comm. Time: 0.022725
+Cluster3@0.0: PE 0: Comm. Time: 0.02251
+Cluster0@0.0: PE 0: Comm. Time: 0.02255
+Cluster4@0.0: PE 0: Comm. Time: 0.02272
+Cluster12@0.0: PE 0: Comm. Time: 0.022729
+Cluster1@0.0: PE 0: Comm. Time: 0.021932
+Cluster5@0.0: PE 0: Comm. Time: 0.021929
+Cluster13@0.0: PE 0: Comm. Time: 0.021702
+Cluster14@0.0: PE 0: Slave Time: 0.282834
+Cluster14@0.0: PE 0: Comm. Time: 0.019867
+Cluster15@0.0: PE 0: Slave Time: 0.282407
+Cluster15@0.0: PE 0: Comm. Time: 0.019468
+====== BOARD 0 ======
+
+ - Acquisition time: 4.89 s
+ - MPPA 0 Power
+   - Power (avg): 5.77 W
+   - Energy     : 28.23 J
