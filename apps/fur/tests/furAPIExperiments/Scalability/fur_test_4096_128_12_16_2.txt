@@ -1,30 +1,30 @@
-Cluster6@0.0: PE 0: Slave Time: 0.174868
-Cluster5@0.0: PE 0: Slave Time: 0.174863
-Cluster1@0.0: PE 0: Slave Time: 0.176367
-Cluster7@0.0: PE 0: Slave Time: 0.175122
-Cluster8@0.0: PE 0: Slave Time: 0.175403
-Cluster0@0.0: PE 0: Slave Time: 0.176998
-Cluster9@0.0: PE 0: Slave Time: 0.174131
-Cluster4@0.0: PE 0: Slave Time: 0.175369
-Cluster2@0.0: PE 0: Slave Time: 0.17634
-Cluster3@0.0: PE 0: Slave Time: 0.17713
-Cluster3@0.0: PE 0: Comm. Time: 0.011416
-Cluster6@0.0: PE 0: Comm. Time: 0.011072
-Cluster5@0.0: PE 0: Comm. Time: 0.011071
-Cluster1@0.0: PE 0: Comm. Time: 0.010642
-Cluster7@0.0: PE 0: Comm. Time: 0.011332
-Cluster8@0.0: PE 0: Comm. Time: 0.011618
-Cluster0@0.0: PE 0: Comm. Time: 0.011279
-Cluster9@0.0: PE 0: Comm. Time: 0.010336
-Cluster4@0.0: PE 0: Comm. Time: 0.01157
-Cluster2@0.0: PE 0: Comm. Time: 0.010624
-Cluster11@0.0: PE 0: Slave Time: 0.174161
-Cluster11@0.0: PE 0: Comm. Time: 0.010381
-Cluster10@0.0: PE 0: Slave Time: 0.174076
-Cluster10@0.0: PE 0: Comm. Time: 0.010298
+Cluster6@0.0: PE 0: Slave Time: 0.174775
+Cluster7@0.0: PE 0: Slave Time: 0.1758
+Cluster2@0.0: PE 0: Slave Time: 0.176336
+Cluster1@0.0: PE 0: Slave Time: 0.176362
+Cluster8@0.0: PE 0: Slave Time: 0.175821
+Cluster4@0.0: PE 0: Slave Time: 0.175781
+Cluster9@0.0: PE 0: Slave Time: 0.174134
+Cluster3@0.0: PE 0: Slave Time: 0.177811
+Cluster0@0.0: PE 0: Slave Time: 0.176953
+Cluster5@0.0: PE 0: Slave Time: 0.174774
+Cluster2@0.0: PE 0: Comm. Time: 0.010615
+Cluster6@0.0: PE 0: Comm. Time: 0.010976
+Cluster7@0.0: PE 0: Comm. Time: 0.012006
+Cluster1@0.0: PE 0: Comm. Time: 0.010644
+Cluster8@0.0: PE 0: Comm. Time: 0.01201
+Cluster4@0.0: PE 0: Comm. Time: 0.011974
+Cluster9@0.0: PE 0: Comm. Time: 0.010337
+Cluster3@0.0: PE 0: Comm. Time: 0.012093
+Cluster0@0.0: PE 0: Comm. Time: 0.011221
+Cluster5@0.0: PE 0: Comm. Time: 0.010975
+Cluster10@0.0: PE 0: Slave Time: 0.174072
+Cluster10@0.0: PE 0: Comm. Time: 0.010284
+Cluster11@0.0: PE 0: Slave Time: 0.174162
+Cluster11@0.0: PE 0: Comm. Time: 0.010374
 ====== BOARD 0 ======
 
- - Acquisition time: 3.63 s
+ - Acquisition time: 3.62 s
  - MPPA 0 Power
    - Power (avg): 5.70 W
-   - Energy     : 20.67 J
+   - Energy     : 20.63 J
