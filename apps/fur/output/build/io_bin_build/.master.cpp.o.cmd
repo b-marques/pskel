@@ -1,0 +1,1 @@
+cmd_output/build/io_bin_build/master.cpp.o := /usr/local/k1tools/bin/k1-g++ -Wp,-MP,-MD,output/build/io_bin_build/.master.cpp.o.d -Wp,-MT,output/build/io_bin_build/master.cpp.o -mcluster=ioddr     -march=k1b -mboard=developer -mos=bare -g -O3 -DMPPA_TRACE_ENABLE -Wall -mhypervisor -std=c++14    -c -o output/build/io_bin_build/master.cpp.o master.cpp

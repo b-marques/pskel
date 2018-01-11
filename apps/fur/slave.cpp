@@ -8,9 +8,10 @@
 // #define PRINT_OUT
 // #define TIME_EXEC
 // #define TIME_SEND
-#define BARRIER_SYNC_MASTER "/mppa/sync/128:1"
-#define BARRIER_SYNC_SLAVE "/mppa/sync/[0..15]:2"
+// #define BARRIER_SYNC_MASTER "/mppa/sync/128:1"
+// #define BARRIER_SYNC_SLAVE "/mppa/sync/[0..15]:2"
 
+#include "../../include/mppa_utils.h"
 #include "../../include/PSkel.h"
 
 using namespace std;
@@ -124,25 +125,30 @@ int main(int argc,char **argv) {
   /***********************************************/
 
   int nb_tiles = atoi(argv[0]);
-  int width = atoi(argv[1]);
-  int height = atoi(argv[2]);
+  int tilling_width = atoi(argv[1]);
+  int tilling_height = atoi(argv[2]);
   int cluster_id = atoi(argv[3]);
   int nb_threads = atoi(argv[4]);
   int iterations = atoi(argv[5]);
   int outteriterations = atoi(argv[6]);
   int itMod = atoi(argv[7]);
+  int nb_clusters = atoi(argv[8]);
+  int width = atoi(argv[9]);
+  int height = atoi(argv[10]);
+  int nb_computated_tiles = atoi(argv[11]);
 
-  Array2D<int> partInput(width, height);
-  Array2D<int> output(width, height);
+  int halo_value = mask.getRange() * iterations;
+
+  Array2D<int> partInput(tilling_width, tilling_height, halo_value);
+  Array2D<int> output(tilling_width, tilling_height, halo_value);
   Stencil2D<Array2D<int>, Mask2D<int>, Arguments> stencil(partInput, output, mask, arg);
   // if(iterations == 0)  {
-  stencil.runMPPA(cluster_id, nb_threads, nb_tiles, outteriterations, itMod);
+  stencil.runMPPA(cluster_id, nb_threads, nb_tiles, outteriterations, iterations, itMod, nb_clusters, width, height, nb_computated_tiles);
   // } else {
   //      stencil.runIterativeMPPA(cluster_id, nb_threads, nb_tiles, iterations);
   //}
   //stencil.~Stencil2D();
   stencil.~Stencil2D();
 
-  printf("Exiting slave: %d", cluster_id);
-  mppa_exit(0);
+  exit(0);
 }

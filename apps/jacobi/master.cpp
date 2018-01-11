@@ -13,35 +13,30 @@
 // #define PRINT_OUT
 // #define TIME_EXEC
 // #define TIME_SEND
-#define ARGC_SLAVE 4
 #include "../../include/PSkel.h"
 
 using namespace std;
 using namespace PSkel;
 
 int main(int argc, char **argv){
-	int width, height, tilingHeight, tilingWidth, iterations, innerIterations, pid, nb_clusters, nb_threads; //stencil size
-	if(argc != 8){
+	int width, height, tilingHeight, tilingWidth, iterations, innerIterations, nb_clusters, nb_threads; //stencil size
+	if(argc != 9){
 		printf ("Wrong number of parameters.\n");
 		printf("Usage: WIDTH HEIGHT TILING_HEIGHT TILING_WIDTH ITERATIONS INNER_ITERATIONS NUMBER_CLUSTERS NUMBER_THREADS\n");
-		mppa_exit(-1);
+		exit(-1);
 	}
 
 	//Stencil configuration
 	width = atoi(argv[1]);
 	height = atoi(argv[2]);
-  	tilingHeight = atoi(argv[3]);
-  	tilingWidth = atoi(argv[4]);
+  tilingHeight = atoi(argv[3]);
+  tilingWidth = atoi(argv[4]);
 	iterations = atoi(argv[5]);
 	innerIterations = atoi(argv[6]);
 	nb_clusters = atoi(argv[7]);
 	nb_threads = atoi(argv[8]);
 
 	//Mask configuration
-
-	Array2D<float> inputGrid(width,height);
-	Array2D<float> outputGrid(width,height);
-
 	float factor = 1.f/(float)width;
 
 	Mask2D<float> mask(4);
@@ -51,26 +46,49 @@ int main(int argc, char **argv){
 	mask.set(2,0,1,0);
 	mask.set(3,0,-1,0);
 
+	int halo_value = mask.getRange()*innerIterations;
 
-	for(size_t h=0;h<inputGrid.getHeight();h++) {
-		for(size_t w=0;w<inputGrid.getWidth();w++) {
-			inputGrid(h,w) = 1.0 + w*0.1 + h*0.01;
+	Array2D<float> inputGrid(width,height, halo_value);
+	Array2D<float> outputGrid(width,height, halo_value);
+
+	for(size_t h=0;h<inputGrid.getRealHeight();h++) {
+		for(size_t w=0;w<inputGrid.getRealWidth();w++) {
+			inputGrid(h+halo_value,w+halo_value) = 1.0 + w*0.1 + h*0.01;
 			// inputGrid(h,w) = h*inputGrid.getWidth() + w;
 		    //printf("inputGrid(%d,%d) = %f;\n", h, w, inputGrid(h,w));
 		}
 	}
 
+	// std::string grid;
+ // for(int h = 0; h < height + halo_value*2; h++) {
+ //   for(int w = 0 ; w < width + halo_value*2;  w++) {
+ //   	int element = inputGrid(h,w);
+	// 		char celement[10];
+	// 		sprintf(celement, " %d", element);
+ //   	grid+= celement;
+ //   }
+ //   grid += "\n";
+	// }
+	// std::cout << grid << std::endl;
 
 	//Instantiate Stencil 2D
 	Stencil2D<Array2D<float>, Mask2D<float>, float> stencil(inputGrid, outputGrid, mask, factor);
 
-	struct timeval start=mppa_master_get_time();
 
 	//Schedule computation to slaves
-	stencil.scheduleMPPA("slave", nb_clusters, nb_threads, tilingHeight, tilingWidth, iterations, innerIterations);
+	stencil.scheduleMPPA("cluster_bin", nb_clusters, nb_threads, width, height, tilingHeight, tilingWidth, iterations, innerIterations);
 
-	struct timeval end=mppa_master_get_time();
-	cout<<"Master Time: " << mppa_master_diff_time(start,end) << endl;
+	// grid = "";
+	// for(int h=0; h < height + halo_value*2; h++) {
+	//  for(int w=0; w < width + halo_value*2; w++) {
+	//  	int element = outputGrid(h,w);
+	// 		char celement[10];
+	// 		sprintf(celement, " %d", element);
+	//  	grid+= celement;
+	//  }
+	//  grid += "\n";
+	// }
+ // 	std::cout << grid << std::endl;
 
-	mppa_exit(0);
+	exit(0);
 }

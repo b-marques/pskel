@@ -25,7 +25,7 @@ cluster-lflags += -pthread -lmppa_remote -lmppa_async -lmppa_request_engine -lmp
 endif
 
 io-bin := io_bin
-io_bin-srcs := master.cpp ../../include/mppa_utils.cpp
+io_bin-srcs := master.cpp
 io_bin-cppflags := -g ${COMPILE_OPTI} -DMPPA_TRACE_ENABLE -Wall -mhypervisor -std=c++14
 io_bin-lflags := -lvbsp -lmppa_remote -lmppa_async -lmppa_request_engine -lpcie_queue -lutask  -lmppapower -lmppanoc -lmpparouting -mhypervisor -Wl,--defsym=_LIBNOC_DISABLE_FIFO_FULL_CHECK=0 -Wl,--defsym=_start_async_copy=0
 

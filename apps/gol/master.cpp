@@ -14,7 +14,6 @@
 // #define TIME_EXEC
 // #define TIME_SEND
 #include "../../include/PSkel.h"
-#include "../../include/mppa_utils.h"
 
 using namespace std;
 using namespace PSkel;
@@ -59,29 +58,30 @@ int main(int argc, char **argv){
 	mask.set(5,1,-1);		mask.set(6,1,0);	mask.set(7,1,1);
 	
 	int halo_value = mask.getRange()*innerIterations;
+
 	Array2D<int> inputGrid(width, height, halo_value);
 	Array2D<int> outputGrid(width, height, halo_value);
 
 	srand(1234);
-	for(int h = 0; h < height + halo_value*2; h++) {
-		for(int w = 0; w < width + halo_value*2; w++) {
+	for(int h = 0 + halo_value; h < height + halo_value; h++) {
+		for(int w = 0 + halo_value; w < width + halo_value; w++) {
 			// inputGrid(h,w) = 0;
-			// inputGrid(h + halo_value, w + halo_value) = rand()%2;
+			inputGrid(h,w) = rand()%2;
 			// inputGrid(h + halo_value,w + halo_value) = h*width+w;
 	    // printf("inputGrid(%d,%d) = %d;\n", h, w, inputGrid(h  + halo_value, w + halo_value));
       // outputGrid(h + halo_value, w + halo_value) = rand()%2;
 		}
 	}
 
-	inputGrid(0 + halo_value,0 + halo_value) = 1;
-	inputGrid(0 + halo_value,1 + halo_value) = 1;
-	inputGrid(1 + halo_value,0 + halo_value) = 1;
-	inputGrid(1 + halo_value,1 + halo_value) = 1;	
+	// inputGrid(0 + halo_value,0 + halo_value) = 1;
+	// inputGrid(0 + halo_value,1 + halo_value) = 1;
+	// inputGrid(1 + halo_value,0 + halo_value) = 1;
+	// inputGrid(1 + halo_value,1 + halo_value) = 1;	
 
-	inputGrid(2 + halo_value,2 + halo_value) = 1;
-	inputGrid(2 + halo_value,3 + halo_value) = 1;
-	inputGrid(3 + halo_value,2 + halo_value) = 1;
-	inputGrid(3 + halo_value,3 + halo_value) = 1;	
+	// inputGrid(2 + halo_value,2 + halo_value) = 1;
+	// inputGrid(2 + halo_value,3 + halo_value) = 1;
+	// inputGrid(3 + halo_value,2 + halo_value) = 1;
+	// inputGrid(3 + halo_value,3 + halo_value) = 1;	
 
 	// for(int h=0;h<height;h++) {
 	// 	for(int w=0;w<width;w++) {
@@ -95,17 +95,17 @@ int main(int argc, char **argv){
 	// 	}
 	// }
 
-//	std::string grid;
-//  for(int h = 0; h < height + halo_value*2; h++) {
-//    for(int w = 0 ; w < width + halo_value*2;  w++) {
-//    	int element = inputGrid(h,w);
-//			char celement[10];
-//			sprintf(celement, " %d", element);
-//    	grid+= celement;
-//    }
-//    grid += "\n";
-//	}
-//	std::cout << grid << std::endl;
+	// std::string grid;
+	// for(int h = 0; h < height + halo_value*2; h++) {
+	//  for(int w = 0 ; w < width + halo_value*2;  w++) {
+	//  	int element = inputGrid(h,w);
+	// 		char celement[10];
+	// 		sprintf(celement, " %d", element);
+	//  	grid+= celement;
+	//  }
+	//  grid += "\n";
+	// }
+	// std::cout << grid << std::endl;
 
 	//Instantiate Stencil 2D
 	Stencil2D<Array2D<int>, Mask2D<int>, Arguments> stencil(inputGrid, outputGrid, mask);
@@ -118,17 +118,17 @@ int main(int argc, char **argv){
 //	std::chrono::time_point<std::chrono::steady_clock> end = mppa_master_get_time();
 //	cout<<"Master Time: " << mppa_master_diff_time(start,end) << endl;
 
-//	grid = "";
-//  for(int h=0; h < height + halo_value*2; h++) {
-//    for(int w=0; w < width + halo_value*2; w++) {
-//    	int element = outputGrid(h,w);
-//			char celement[10];
-//			sprintf(celement, " %d", element);
-//    	grid+= celement;
-//    }
-//    grid += "\n";
-//  }
-//  std::cout << grid << std::endl;
+	// grid = "";
+ // for(int h=0; h < height + halo_value*2; h++) {
+ //   for(int w=0; w < width + halo_value*2; w++) {
+ //   	int element = outputGrid(h,w);
+	// 		char celement[10];
+	// 		sprintf(celement, " %d", element);
+ //   	grid+= celement;
+ //   }
+ //   grid += "\n";
+ // }
+ // std::cout << grid << std::endl;
 
 
 

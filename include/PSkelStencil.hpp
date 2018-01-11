@@ -407,12 +407,10 @@ namespace PSkel{
             mppa_rpc_client_init();
             mppa_async_init();
             mppa_remote_client_init();
-
             double exec_time = 0;
             double comm_time = 0;
 
             std::chrono::time_point<std::chrono::steady_clock> begin_exec = mppa_slave_get_time();
-            
             std::chrono::time_point<std::chrono::steady_clock> begin_comm = mppa_slave_get_time();
             this->input.mppa_segment_clone(1);
             this->output.mppa_segment_clone(2);
@@ -431,6 +429,7 @@ namespace PSkel{
 
             int nb_tiles_aux = nb_tiles;
             int j = width_offset;
+
             for(int i = height_offset; i < height && nb_tiles_aux; i+=this->input.getRealHeight()){
                 for(; j < width && nb_tiles_aux; j+=this->input.getRealWidth()){
                     
@@ -1224,6 +1223,10 @@ namespace PSkel{
             this->output = _output;
             this->args = _args;
             this->mask = _mask;
+            #ifdef MPPA_MASTER
+            this->input.mppa_segment_create(1);
+            this->output.mppa_segment_create(2);
+            #endif
         }
 
     template<class Array, class Mask, class Args>
