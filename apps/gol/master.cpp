@@ -59,8 +59,20 @@ int main(int argc, char **argv){
 	
 	int halo_value = mask.getRange()*innerIterations;
 
+	// int* teste = (int*)calloc(1, sizeof(int));
+	// int count = 550000000;
+	// while(teste != NULL){
+	// 	free(teste);
+	// 	count+=10000000;
+	// 	teste = (int*) calloc(count, sizeof(int));
+	// 	printf("COUNT:%d\n", count);
+	// }
+	
+
+
 	Array2D<int> inputGrid(width, height, halo_value);
 	Array2D<int> outputGrid(width, height, halo_value);
+
 
 	srand(1234);
 	for(int h = 0 + halo_value; h < height + halo_value; h++) {

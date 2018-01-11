@@ -86,7 +86,7 @@ template<typename T>
 ArrayBase<T>::ArrayBase(size_t width, size_t height, size_t depth, size_t halo_zone){
 	this->width = width + halo_zone*2;
 	this->height = height + halo_zone*2;
-	this->depth = depth + halo_zone*2;
+	this->depth = depth;
 	this->realWidth = width;
 	this->realHeight = height;
 	this->realDepth = depth;

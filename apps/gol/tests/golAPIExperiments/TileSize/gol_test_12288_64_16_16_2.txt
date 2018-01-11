@@ -1,7 +1,38 @@
-IODDR0@0.0: RM 0: assertion "this->mppaArray!= NULL" failed: file "../../include/PSkelArray.hpp", line 152, function: void PSkel::ArrayBase<T>::mppaAlloc() [with T = int]
+Cluster3@0.0: PE 0: Slave Time: 0.423199
+Cluster11@0.0: PE 0: Slave Time: 0.4233
+Cluster7@0.0: PE 0: Slave Time: 0.423299
+Cluster3@0.0: PE 0: Comm. Time: 0.103038
+Cluster1@0.0: PE 0: Slave Time: 0.423513
+Cluster11@0.0: PE 0: Comm. Time: 0.103098
+Cluster5@0.0: PE 0: Slave Time: 0.423609
+Cluster9@0.0: PE 0: Slave Time: 0.423624
+Cluster8@0.0: PE 0: Slave Time: 0.425392
+Cluster0@0.0: PE 0: Slave Time: 0.425297
+Cluster7@0.0: PE 0: Comm. Time: 0.103106
+Cluster4@0.0: PE 0: Slave Time: 0.425297
+Cluster10@0.0: PE 0: Slave Time: 0.424438
+Cluster12@0.0: PE 0: Slave Time: 0.425393
+Cluster2@0.0: PE 0: Slave Time: 0.424328
+Cluster6@0.0: PE 0: Slave Time: 0.424424
+Cluster13@0.0: PE 0: Slave Time: 0.423108
+Cluster13@0.0: PE 0: Comm. Time: 0.102941
+Cluster5@0.0: PE 0: Comm. Time: 0.103381
+Cluster9@0.0: PE 0: Comm. Time: 0.103424
+Cluster8@0.0: PE 0: Comm. Time: 0.105193
+Cluster0@0.0: PE 0: Comm. Time: 0.10499
+Cluster4@0.0: PE 0: Comm. Time: 0.105052
+Cluster10@0.0: PE 0: Comm. Time: 0.104269
+Cluster12@0.0: PE 0: Comm. Time: 0.105101
+Cluster2@0.0: PE 0: Comm. Time: 0.104125
+Cluster6@0.0: PE 0: Comm. Time: 0.10426
+Cluster1@0.0: PE 0: Comm. Time: 0.103303
+Cluster14@0.0: PE 0: Slave Time: 0.420356
+Cluster15@0.0: PE 0: Slave Time: 0.415924
+Cluster14@0.0: PE 0: Comm. Time: 0.100235
+Cluster15@0.0: PE 0: Comm. Time: 0.095914
 ====== BOARD 0 ======
 
- - Acquisition time: 2.93 s
+ - Acquisition time: 16.60 s
  - MPPA 0 Power
-   - Power (avg): 5.18 W
-   - Energy     : 15.15 J
+   - Power (avg): 5.47 W
+   - Energy     : 90.86 J

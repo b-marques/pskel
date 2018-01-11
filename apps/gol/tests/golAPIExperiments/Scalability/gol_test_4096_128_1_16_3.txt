@@ -1,8 +1,8 @@
-Cluster0@0.0: PE 0: Slave Time: 0.481372
-Cluster0@0.0: PE 0: Comm. Time: 0.130053
+Cluster0@0.0: PE 0: Slave Time: 0.474492
+Cluster0@0.0: PE 0: Comm. Time: 0.126553
 ====== BOARD 0 ======
 
- - Acquisition time: 2.97 s
+ - Acquisition time: 2.65 s
  - MPPA 0 Power
-   - Power (avg): 5.26 W
-   - Energy     : 15.62 J
+   - Power (avg): 5.23 W
+   - Energy     : 13.82 J
