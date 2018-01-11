@@ -1,7 +1,0 @@
-IODDR0@0.0: RM 0: assertion "this->mppaArray!= NULL" failed: file "../../include/PSkelArray.hpp", line 152, function: void PSkel::ArrayBase<T>::mppaAlloc() [with T = int]
-====== BOARD 0 ======
-
- - Acquisition time: 1.98 s
- - MPPA 0 Power
-   - Power (avg): 5.13 W
-   - Energy     : 10.14 J
