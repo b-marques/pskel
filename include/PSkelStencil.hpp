@@ -220,7 +220,7 @@ namespace PSkel{
             sprintf(argv_slave[1], "%d", tiling_width);
             sprintf(argv_slave[2], "%d", tiling_height);
             sprintf(argv_slave[4], "%d", nb_threads);
-            sprintf(argv_slave[5], "%d", iterations);
+            sprintf(argv_slave[5], "%d", inner_iterations);
             sprintf(argv_slave[6], "%d", outter_iterations);
             sprintf(argv_slave[7], "%d", it_mod);
             sprintf(argv_slave[8], "%d", nb_clusters);
@@ -305,105 +305,6 @@ namespace PSkel{
 #ifdef MPPA_SLAVE
     template<class Array, class Mask, class Args>
         void StencilBase<Array, Mask,Args>::runMPPA(int cluster_id, int nb_threads, int nb_tiles, int outterIterations, int innerIterations, int itMod, int nb_clusters, int width, int height, int nb_computated_tiles){
-            // Array finalArr;
-            // Array coreTmp;
-            // Array tmp;
-            // Array inputTmp;
-            // Array outputTmp;
-            // Array input;
-            // Array auxPortal;
-            // int *aux;
-            // for(int j = 0; j < outterIterations; j++) {
-            //     barrier_t *global_barrier = mppa_create_slave_barrier(BARRIER_SYNC_MASTER, BARRIER_SYNC_SLAVE);
-            //     for(int i = 0; i < nb_tiles; i++) {
-            //         mppa_barrier_wait(global_barrier);
-
-            //         if(i == 0) {
-            //             auxPortal.portalAuxReadAlloc(1, cluster_id);
-            //             finalArr.portalWriteAlloc(0);
-            //         }
-
-            //         mppa_barrier_wait(global_barrier);
-            //         auxPortal.copyFromAux();
-
-            //         aux = auxPortal.getAux();
-
-            //         int heightOffset = aux[0];
-            //         int it = aux[1];
-            //         int subIterations = aux[2];
-            //         int coreWidthOffset = aux[3];
-            //         int coreHeightOffset = aux[4];
-            //         int coreDepthOffset = aux[5];
-            //         int coreWidth = aux[6];
-            //         int coreHeight = aux[7];
-            //         int coreDepth = aux[8];
-            //         int h = aux[10];
-            //         int w = aux[11];
-            //         int d = aux[12];
-            //         int widthOffset = aux[13];
-            //         int baseWidth = aux[14];
-
-            //         finalArr.mppaAlloc(w,h,d);
-            //         inputTmp.mppaAlloc(w,h,d);
-            //         outputTmp.mppaAlloc(w,h,d);
-            //         inputTmp.portalReadAlloc(1, cluster_id);
-            //         mppa_barrier_wait(global_barrier);
-
-            //         inputTmp.copyFrom();
-
-            //         for(size_t h=0;h<inputTmp.getHeight();h++) {
-            //         	for(size_t w=0;w<inputTmp.getWidth();w++) {
-            //           	  printf("Arrived(%d,%d):%d\n",h,w, inputTmp(h,w));
-            //           }
-            //         }
-
-            //         this->runIterativeMPPA(inputTmp, outputTmp, subIterations, nb_threads);
-            //         for(size_t h=0;h<outputTmp.getHeight();h++) {
-            //         	for(size_t w=0;w<outputTmp.getWidth();w++) {
-            //           	  printf("Computated(%d,%d):%d\n",h,w, outputTmp(h,w));
-            //           }
-            //         }
-
-            //         if (subIterations%2==0) {
-            //             finalArr.mppaMemCopy(inputTmp);
-            //         } else {
-            //             finalArr.mppaMemCopy(outputTmp);
-            //         }
-
-
-            //         coreTmp.hostSlice(finalArr, coreWidthOffset, coreHeightOffset, coreDepthOffset, coreWidth, coreHeight, coreDepth);
-            //         for(size_t h=0;h<coreTmp.getHeight();h++) {
-            //             for(size_t w=0;w<coreTmp.getWidth();w++) {
-            //                 printf("finalArr(%d,%d):%d, cluster[%d]\n",h,w, coreTmp(h,w), cluster_id);
-            //             }
-            //         }
-
-            //         int masterBaseOffset = ((heightOffset*baseWidth) + widthOffset);
-            //         finalArr.copyTo(coreHeight, coreWidth, w, baseWidth, (inputTmp.getWidth()*coreHeightOffset)+coreWidthOffset, masterBaseOffset);
-            //         finalArr.waitWrite();
-            //         finalArr.mppaFree();
-            //         finalArr.auxFree();
-            //         inputTmp.mppaFree();
-            //         inputTmp.auxFree();
-
-
-            //         outputTmp.mppaFree();
-            //         outputTmp.auxFree();
-
-            //         inputTmp.closeReadPortal();
-
-            //         if (i == (nb_tiles-1)) {
-            //             auxPortal.closeAuxReadPortal();
-            //             finalArr.closeWritePortal();
-            //         }
-            //     }
-            //     if(cluster_id >= itMod) {
-            //         mppa_barrier_wait(global_barrier);
-            //         mppa_barrier_wait(global_barrier);
-            //         mppa_barrier_wait(global_barrier);
-            //     }
-            //     mppa_close_barrier(global_barrier);
-            // }
             mppa_rpc_client_init();
             mppa_async_init();
             mppa_remote_client_init();
@@ -427,55 +328,80 @@ namespace PSkel{
             std::chrono::time_point<std::chrono::steady_clock> end_comm = mppa_slave_get_time();
             comm_time += mppa_slave_diff_time(begin_comm, end_comm);
 
-            int nb_tiles_aux = nb_tiles;
-            int j = width_offset;
+            for(int out_iteration = 0; out_iteration < outterIterations; ++out_iteration){
+                int nb_tiles_aux = nb_tiles;
+                int j = width_offset;
+                for(int i = height_offset; i < height && nb_tiles_aux; i+=this->input.getRealHeight()){
+                    for(; j < width && nb_tiles_aux; j+=this->input.getRealWidth()){
+                        
 
-            for(int i = height_offset; i < height && nb_tiles_aux; i+=this->input.getRealHeight()){
-                for(; j < width && nb_tiles_aux; j+=this->input.getRealWidth()){
-                    
+                        begin_comm = mppa_slave_get_time();
 
-                    begin_comm = mppa_slave_get_time();
+                        mppa_async_point2d_t remote_point = {
+                            j, // xpos
+                            i,                                     // ypos
+                            width + (int)this->input.getWidthOffset()*2,  // xdim
+                            height + (int)this->input.getHeightOffset()*2,                 // ydim
+                        };
 
-                    mppa_async_point2d_t remote_point = {
-                        j, // xpos
-                        i,                                     // ypos
-                        width + (int)this->input.getWidthOffset()*2,  // xdim
-                        height + (int)this->input.getHeightOffset()*2,                 // ydim
-                    };
-                    // printf("remote_point:\n%d\n%d\n%d\n%d\n", remote_point.xpos, remote_point.ypos, remote_point.xdim, remote_point.ydim);
-                    this->input.mppa_get_block2d(&remote_point);
-                    end_comm = mppa_slave_get_time();
-                    comm_time += mppa_slave_diff_time(begin_comm, end_comm);
+                        // printf("remote_point:\n%d\n%d\n%d\n%d\n", remote_point.xpos, remote_point.ypos, remote_point.xdim, remote_point.ydim);
+                        this->input.mppa_get_block2d(&remote_point);
 
-                    // if(cluster_id == 0) {
-                    //     for(unsigned h=0;h<this->input.getHeight();h++) {
-                    //         for(unsigned w=0;w<this->input.getWidth();w++) {
-                    //           printf("inputGrid-slave(%d,%d) = %d;\n", h, w, this->input(h,w));
-                    //         }
-                    //     }
-                    // }
+                        // if(cluster_id == 12 ) {
+                        //     std::string grid;
+                        //     for(unsigned h = 0; h < this->input.getHeight() ; h++) {
+                        //      for(unsigned w = 0; w < this->input.getWidth() ;  w++) {
+                        //         int element = this->input(h,w);
+                        //         char celement[10];
+                        //         sprintf(celement, " %d", element);
+                        //         grid+= celement;
+                        //      }
+                        //      grid += "\n";
+                        //     }
+                        //     std::cout << grid << std::endl;
+                        // }
 
-                    this->runIterativeMPPA(this->input, this->output, 1 /*nb_iterations*/, nb_threads);
-                    
-                    begin_comm = mppa_slave_get_time();
-                    remote_point.xpos += (int)this->output.getWidthOffset();
-                    remote_point.ypos += (int)this->output.getHeightOffset();
-                    
-                    
-                    this->output.mppa_put_block2d(&remote_point);
-                    end_comm = mppa_slave_get_time();
-                    comm_time += mppa_slave_diff_time(begin_comm, end_comm);
+                        end_comm = mppa_slave_get_time();
+                        comm_time += mppa_slave_diff_time(begin_comm, end_comm);
 
-                    --nb_tiles_aux;
+                        this->runIterativeMPPA(this->input, this->output, innerIterations, nb_threads);
+                        
+                        begin_comm = mppa_slave_get_time();
+                        remote_point.xpos += (int)this->output.getWidthOffset();
+                        remote_point.ypos += (int)this->output.getHeightOffset();
+                        
+                        if(innerIterations % 2 == 0) {
+                            mppa_async_segment_t aux = this->input.mppa_segment();
+                            this->input.mppa_segment(this->output.mppa_segment());
+                            this->output.mppa_segment(aux);
+                            
+                            this->input.mppa_put_block2d(&remote_point);
+
+                            aux = this->input.mppa_segment();
+                            this->input.mppa_segment(this->output.mppa_segment());
+                            this->output.mppa_segment(aux);
+                        } else {
+                            this->output.mppa_put_block2d(&remote_point);
+                        } 
+                        end_comm = mppa_slave_get_time();
+                        comm_time += mppa_slave_diff_time(begin_comm, end_comm);
+
+                        --nb_tiles_aux;
+                    }
+                    j = 0; /* "reset" ypos of tile */
                 }
-                j = 0; /* "reset" ypos */
+                mppa_rpc_barrier_all();
+                mppa_async_segment_t aux = this->input.mppa_segment();
+                this->input.mppa_segment(this->output.mppa_segment());
+                this->output.mppa_segment(aux);
             }
 
             std::chrono::time_point<std::chrono::steady_clock> end_exec = mppa_slave_get_time();
             exec_time = mppa_slave_diff_time(begin_exec, end_exec);
 
-            cout<< "Slave Time: " << exec_time << endl;
-            cout<< "Comm. Time: " << comm_time << endl;
+
+            // cout<< "Slave Time: " << exec_time << endl;
+            // cout<< "Comm. Time: " << comm_time << endl;
           
             mppa_async_final();
         }
@@ -493,8 +419,34 @@ namespace PSkel{
                     this->runOpenMP(in, out, width, height, depth, maskRange, numThreads);
                 } else {
                     this->runOpenMP(out, in, width, height, depth, maskRange, numThreads);
-
                 }
+
+                        if(__k1_get_cluster_id() == 12 ) {
+                            std::string grid;
+                            for(unsigned h = 0; h < out.getHeight() ; h++) {
+                             for(unsigned w = 0; w < out.getWidth() ;  w++) {
+                                int element = out(h,w);
+                                char celement[10];
+                                sprintf(celement, " %d", element);
+                                grid+= celement;
+                             }
+                             grid += "\n";
+                            }
+                            std::cout << grid << std::endl;
+
+                            grid = "";
+                            for(unsigned h = 0; h < in.getHeight() ; h++) {
+                             for(unsigned w = 0; w < in.getWidth() ;  w++) {
+                                int element = in(h,w);
+                                char celement[10];
+                                sprintf(celement, " %d", element);
+                                grid+= celement;
+                             }
+                             grid += "\n";
+                            }
+                            std::cout << grid << std::endl;
+                        }
+
             }
 
         }
@@ -1172,9 +1124,9 @@ namespace PSkel{
         void Stencil3D<Array,Mask,Args>::runOpenMP(Array in, Array out, size_t numThreads){
             omp_set_num_threads(numThreads);
 #pragma omp parallel for
-            for (int h = 0 + in.getHeightOffset(); h < in.getHeight() - in.getHeightOffset(); h++){
-                for (int w = 0 + in.getWidthOffset(); w < in.getWidth() - in.getWidthOffset(); w++){
-                    for (int d = 0 + in.getDepthOffset(); d < in.getDepth() - in.getDepthOffset(); d++){
+            for (int h = 0; h < in.getHeight(); h++){
+                for (int w = 0; w < in.getWidth(); w++){
+                    for (int d = 0; d < in.getDepth(); d++){
                         stencilKernel(in,out,this->mask,this->args,h,w,d);
                     }}}
         }
@@ -1269,22 +1221,11 @@ namespace PSkel{
 
 #ifndef MPPA_MASTER
     template<class Array, class Mask, class Args>
-        void Stencil2D<Array,Mask,Args>::runOpenMP(Array in, Array out, size_t width, size_t height, size_t depth, size_t maskRange, size_t numThreads){
-//             size_t hrange = height-maskRange;
-//             size_t wrange = width-maskRange;
-//             int count = 0;
-// #pragma omp parallel num_threads(numThreads)
-//             {
-// #pragma omp for
-//                 for (size_t h = maskRange; h < hrange; h++){
-//                     for (size_t w = maskRange; w < wrange; w++){
-//                         stencilKernel(in,out,this->mask,this->args,h,w);
-//                     }}
-//             }
+        inline __attribute__((always_inline)) void Stencil2D<Array,Mask,Args>::runOpenMP(Array in, Array out, size_t width, size_t height, size_t depth, size_t maskRange, size_t numThreads){
             omp_set_num_threads(numThreads);
 #pragma omp parallel for
-            for (unsigned h = 0; h < in.getHeight(); h++){
-                for (unsigned w = 0; w < in.getWidth(); w++){
+            for (unsigned h = maskRange; h < in.getHeight() - maskRange; h++){
+                for (unsigned w = maskRange; w < in.getWidth() - maskRange; w++){
                     stencilKernel(in,out,this->mask,this->args,h,w);
                     }}
         }

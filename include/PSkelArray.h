@@ -72,7 +72,7 @@ private:
 	#endif
 	#ifdef PSKEL_MPPA
 	T *mppaArray;
-  mppa_async_segment_t mppa_segment;
+  mppa_async_segment_t mppa_segment_;
  	//T *comm_buffer;
 	#endif
 
@@ -298,6 +298,14 @@ public:
 
   #ifdef PSKEL_MPPA
   void mppa_put_block2d(const mppa_async_point2d_t *remote_point);
+  #endif
+
+  #ifdef PSKEL_MPPA
+  void mppa_segment(const mppa_async_segment_t mppa_segment);
+  #endif
+
+  #ifdef PSKEL_MPPA
+  mppa_async_segment_t mppa_segment();
   #endif
 
 	#ifdef PSKEL_MPPA

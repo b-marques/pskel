@@ -308,7 +308,7 @@ void ArrayBase<T>::mppa_get_block2d(const mppa_async_point2d_t *remote_point) {
   };
 
 	assert(mppa_async_sget_block2d(this->mppaArray, 
-																 &(this->mppa_segment),
+																 &(this->mppa_segment_),
 																 0, sizeof(T), this->width, this->height,
 																 &local_point,
 																 remote_point,
@@ -331,7 +331,10 @@ void ArrayBase<T>::mppa_get_block2d(const mppa_async_point2d_t *remote_point) {
  //      }
  //      grid += "\n";
  //  }
- //  std::cout << grid << std::endl;
+  // if (id == 13){
+  	// std::cout << "width :" <<this->width << "    height: "<< this->height << std::endl;
+  	// std::cout << grid << std::endl;
+  // }
 
 }
 #endif
@@ -351,7 +354,7 @@ void ArrayBase<T>::mppa_put_block2d(const mppa_async_point2d_t *remote_point) {
   // printf("local_point:\n%d\n%d\n%d\n%d\n", local_point.xpos, local_point.ypos, local_point.xdim, local_point.ydim);
 
 	assert(mppa_async_sput_block2d(this->mppaArray, 
-																 &(this->mppa_segment),
+																 &(this->mppa_segment_),
 																 0, sizeof(T), this->realWidth, this->realHeight,
 																 &local_point,
 																 remote_point,
@@ -374,7 +377,23 @@ void ArrayBase<T>::mppa_put_block2d(const mppa_async_point2d_t *remote_point) {
  //      }
  //      grid += "\n";
  //  }
- //  std::cout << grid << std::endl;
+
+  // if (id == 13)
+  // std::cout << grid << std::endl;
+}
+#endif
+
+#ifdef PSKEL_MPPA
+template<typename T>
+void ArrayBase<T>::mppa_segment(const mppa_async_segment_t mppa_segment) {
+	this->mppa_segment_ = mppa_segment;
+}
+#endif
+
+#ifdef PSKEL_MPPA
+template<typename T>
+mppa_async_segment_t ArrayBase<T>::mppa_segment() {
+	return this->mppa_segment_;
 }
 #endif
 
@@ -476,14 +495,14 @@ void ArrayBase<T>::mppaMasterClone(Arrays array){
 #ifdef PSKEL_MPPA
 template<typename T>
 void ArrayBase<T>::mppa_segment_create(int id){
-	assert(mppa_async_segment_create(&(this->mppa_segment), id, this->mppaArray, size()*sizeof(T), 0, 0, NULL) == 0);
+	assert(mppa_async_segment_create(&(this->mppa_segment_), id, this->mppaArray, size()*sizeof(T), 0, 0, NULL) == 0);
 }
 #endif
 
 #ifdef PSKEL_MPPA
 template<typename T>
 void ArrayBase<T>::mppa_segment_clone(int id){
-	assert(mppa_async_segment_clone(&(this->mppa_segment), id , NULL, 0, NULL) == 0);
+	assert(mppa_async_segment_clone(&(this->mppa_segment_), id , NULL, 0, NULL) == 0);
 }
 #endif
 
