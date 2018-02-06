@@ -43,7 +43,7 @@
 #ifdef PSKEL_MPPA
 #include "common.h"
 #include <mppa_async.h>
-//#include "interface_mppa.h"
+#include "mppa_utils.h"
 #endif
 
 #include "PSkelDefs.h"
@@ -72,7 +72,8 @@ private:
 	#endif
 	#ifdef PSKEL_MPPA
 	T *mppaArray;
-  mppa_async_segment_t mppa_segment_;
+  	mppa_async_segment_t mppa_segment_;
+  	struct work_area_t mppa_work_area_;
  	//T *comm_buffer;
 	#endif
 
@@ -292,21 +293,33 @@ public:
 	void mppaFree();
 	#endif
 
-  #ifdef PSKEL_MPPA
-  void mppa_get_block2d(const mppa_async_point2d_t *remote_point);
-  #endif
+	#ifdef PSKEL_MPPA
+	void mppa_get_block2d(const mppa_async_point2d_t *remote_point);
+	#endif
 
-  #ifdef PSKEL_MPPA
-  void mppa_put_block2d(const mppa_async_point2d_t *remote_point);
-  #endif
+	#ifdef PSKEL_MPPA
+	void mppa_put_block2d(const mppa_async_point2d_t *remote_point);
+	#endif
 
-  #ifdef PSKEL_MPPA
-  void mppa_segment(const mppa_async_segment_t mppa_segment);
-  #endif
+	#ifdef PSKEL_MPPA
+	void mppa_segment(const mppa_async_segment_t mppa_segment);
+	#endif
 
-  #ifdef PSKEL_MPPA
-  mppa_async_segment_t mppa_segment();
-  #endif
+	#ifdef PSKEL_MPPA
+	mppa_async_segment_t mppa_segment();
+	#endif
+
+	#ifdef PSKEL_MPPA
+	void mppa_work_area(const struct work_area_t work_area);
+	#endif
+
+	#ifdef PSKEL_MPPA
+	struct work_area_t mppa_work_area();
+	#endif
+
+	#ifdef PSKEL_MPPA
+	void mppa_clear();
+	#endif
 
 	#ifdef PSKEL_MPPA
 	__host__ __forceinline__ T & mppaGet(size_t h,size_t w,size_t d) const ;

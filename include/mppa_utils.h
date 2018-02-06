@@ -4,8 +4,13 @@
 #include <iostream>
 #include <chrono>
 
-
-#define BILLION 1E9
+struct work_area_t {
+	int x_init,
+		y_init,
+		x_final,
+		y_final;
+	int dist_to_border[4];
+};
 
 std::chrono::time_point<std::chrono::steady_clock> mppa_master_get_time(void);
 std::chrono::time_point<std::chrono::steady_clock> mppa_slave_get_time(void);

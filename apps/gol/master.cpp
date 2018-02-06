@@ -66,7 +66,6 @@ int main(int argc, char **argv){
 	srand(1234);
 	for(int h = 0 + halo_value; h < height + halo_value; h++) {
 		for(int w = 0 + halo_value; w < width + halo_value; w++) {
-			// inputGrid(h,w) = 0;
 			inputGrid(h,w) = rand()%2;
 			// inputGrid(h + halo_value,w + halo_value) = h*width+w;
 	    // printf("inputGrid(%d,%d) = %d;\n", h, w, inputGrid(h  + halo_value, w + halo_value));
@@ -74,12 +73,12 @@ int main(int argc, char **argv){
 		}
 	}
 
-	// inputGrid(0 + halo_value,0 + halo_value) = 1;
-	// inputGrid(0 + halo_value,1 + halo_value) = 1;
-	// inputGrid(1 + halo_value,0 + halo_value) = 1;
-	// inputGrid(1 + halo_value,1 + halo_value) = 1;	
+	// inputGrid(0 + halo_value,3 + halo_value) = 1;
+	// inputGrid(1 + halo_value,3 + halo_value) = 1;
+	// inputGrid(2 + halo_value,3 + halo_value) = 1;
+	// inputGrid(3 + halo_value,3 + halo_value) = 1;	
 
-	// inputGrid(2 + halo_value,2 + halo_value) = 1;
+	// inputGrid(1 + halo_value,2 + halo_value) = 1;
 	// inputGrid(2 + halo_value,3 + halo_value) = 1;
 	// inputGrid(3 + halo_value,2 + halo_value) = 1;
 	// inputGrid(3 + halo_value,3 + halo_value) = 1;
@@ -149,6 +148,7 @@ int main(int argc, char **argv){
 		 }
 		 grid += "\n";
 		}
+		std::cout << "printing output" << std::endl;
 		std::cout << grid << std::endl;
 	} else { 
 		grid = "";
@@ -161,6 +161,7 @@ int main(int argc, char **argv){
 		 }
 		 grid += "\n";
 		}
+		std::cout << "printing input" << std::endl;
 		std::cout << grid << std::endl;
 	}
 		

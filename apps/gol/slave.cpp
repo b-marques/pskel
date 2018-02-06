@@ -74,9 +74,7 @@ __parallel__ void stencilKernel(Array2D<int> input, Array2D<int> output,
   //                    input(i,j-1)   + input(i,j+1) ;
   //   }
   //
-   
-   output(i,j) = (neighbors == 3 || (neighbors == 2 && central))?1:0;
-
+  output(i,j) = (neighbors == 3 || (neighbors == 2 && central))?1:0;
   // output(i,j) = input(i,j);
   }
 }

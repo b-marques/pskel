@@ -397,6 +397,33 @@ mppa_async_segment_t ArrayBase<T>::mppa_segment() {
 }
 #endif
 
+#ifdef PSKEL_MPPA
+template<typename T>
+void ArrayBase<T>::mppa_work_area(const struct work_area_t work_area) {
+	this->mppa_work_area_.x_init = work_area.x_init;
+	this->mppa_work_area_.y_init = work_area.y_init;
+	this->mppa_work_area_.x_final = work_area.x_final;
+	this->mppa_work_area_.y_final = work_area.y_final;
+	for(int i = 0; i < 4; ++i){
+		this->mppa_work_area_.dist_to_border[i] = work_area.dist_to_border[i];	
+	}
+}
+#endif
+
+#ifdef PSKEL_MPPA
+template<typename T>
+struct work_area_t ArrayBase<T>::mppa_work_area() {
+	return this->mppa_work_area_;
+}
+#endif
+
+#ifdef PSKEL_MPPA
+template<typename T>
+void ArrayBase<T>::mppa_clear(){
+	memset(mppaArray, 0, size()*sizeof(T));
+}
+#endif
+
 template<typename T> template<typename Arrays>
 void ArrayBase<T>::hostSlice(Arrays array, size_t widthOffset, size_t heightOffset, size_t depthOffset, size_t width, size_t height, size_t depth){
 	//maintain previous allocated area
