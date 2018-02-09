@@ -59,17 +59,17 @@ int main(int argc, char **argv){
 		}
 	}
 
-	std::string grid;
- for(int h = 0+ halo_value; h < height + halo_value; h++) {
-   for(int w = 0 + halo_value; w < width + halo_value;  w++) {
-   	int element = inputGrid(h,w);
-			char celement[10];
-			sprintf(celement, " %d", element);
-   	grid+= celement;
-   }
-   grid += "\n";
-	}
-	std::cout << grid << std::endl;
+	// std::string grid;
+ // for(int h = 0+ halo_value; h < height + halo_value; h++) {
+ //   for(int w = 0 + halo_value; w < width + halo_value;  w++) {
+ //   	int element = inputGrid(h,w);
+	// 		char celement[10];
+	// 		sprintf(celement, " %d", element);
+ //   	grid+= celement;
+ //   }
+ //   grid += "\n";
+	// }
+	// std::cout << grid << std::endl;
 
 	//Instantiate Stencil 2D
 	Stencil2D<Array2D<float>, Mask2D<float>, float> stencil(inputGrid, outputGrid, mask, factor);
@@ -78,29 +78,29 @@ int main(int argc, char **argv){
 	//Schedule computation to slaves
 	stencil.scheduleMPPA("cluster_bin", nb_clusters, nb_threads, width, height, tilingHeight, tilingWidth, iterations, innerIterations);
 
-	grid = "";
-	for(int h=0+ halo_value; h < height + halo_value; h++) {
-	 for(int w=0+ halo_value; w < width + halo_value; w++) {
-	 	int element = outputGrid(h,w);
-			char celement[10];
-			sprintf(celement, " %d", element);
-	 	grid+= celement;
-	 }
-	 grid += "\n";
-	}
-	std::cout << grid << std::endl;
+	// grid = "";
+	// for(int h=0+ halo_value; h < height + halo_value; h++) {
+	//  for(int w=0+ halo_value; w < width + halo_value; w++) {
+	//  	int element = outputGrid(h,w);
+	// 		char celement[10];
+	// 		sprintf(celement, " %d", element);
+	//  	grid+= celement;
+	//  }
+	//  grid += "\n";
+	// }
+	// std::cout << grid << std::endl;
 
-	grid = "";
-	for(int h=0+ halo_value; h < height + halo_value; h++) {
-	 for(int w=0+ halo_value; w < width + halo_value; w++) {
-	 	int element = inputGrid(h,w);
-			char celement[10];
-			sprintf(celement, " %d", element);
-	 	grid+= celement;
-	 }
-	 grid += "\n";
-	}
-	std::cout << grid << std::endl;
+	// grid = "";
+	// for(int h=0+ halo_value; h < height + halo_value; h++) {
+	//  for(int w=0+ halo_value; w < width + halo_value; w++) {
+	//  	int element = inputGrid(h,w);
+	// 		char celement[10];
+	// 		sprintf(celement, " %d", element);
+	//  	grid+= celement;
+	//  }
+	//  grid += "\n";
+	// }
+	// std::cout << grid << std::endl;
 
 
 	// grid = "";

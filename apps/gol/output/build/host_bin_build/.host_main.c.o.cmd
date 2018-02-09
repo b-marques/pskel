@@ -1,1 +1,0 @@
-cmd_output/build/host_bin_build/host_main.c.o := gcc -Wp,-MP,-MD,output/build/host_bin_build/.host_main.c.o.d -Wp,-MT,output/build/host_bin_build/host_main.c.o -I/usr/local/k1tools/include        -c -o output/build/host_bin_build/host_main.c.o host_main.c

@@ -110,17 +110,17 @@ int main(int argc, char **argv){
         }
     }
 
-  std::string grid;
-  for(int h = 0+ halo_value; h < height + halo_value; h++) {
-   for(int w = 0 + halo_value; w < width + halo_value;  w++) {
-    int element = inputGrid(h,w);
-      char celement[10];
-      sprintf(celement, " %d", element);
-    grid+= celement;
-   }
-   grid += "\n";
-  }
-  std::cout << grid << std::endl;
+  // std::string grid;
+  // for(int h = 0+ halo_value; h < height + halo_value; h++) {
+  //  for(int w = 0 + halo_value; w < width + halo_value;  w++) {
+  //   int element = inputGrid(h,w);
+  //     char celement[10];
+  //     sprintf(celement, " %d", element);
+  //   grid+= celement;
+  //  }
+  //  grid += "\n";
+  // }
+  // std::cout << grid << std::endl;
 
 	//Instantiate Stencil 2D
 	Arguments arg;
@@ -153,29 +153,29 @@ int main(int argc, char **argv){
   // }
   // std::cout << grid << std::endl;
 
-  grid = "";
-  for(int h=0+ halo_value; h < height + halo_value; h++) {
-   for(int w=0+ halo_value; w < width + halo_value; w++) {
-    int element = outputGrid(h,w);
-      char celement[10];
-      sprintf(celement, " %d", element);
-    grid+= celement;
-   }
-   grid += "\n";
-  }
-  std::cout << grid << std::endl;
+  // grid = "";
+  // for(int h=0+ halo_value; h < height + halo_value; h++) {
+  //  for(int w=0+ halo_value; w < width + halo_value; w++) {
+  //   int element = outputGrid(h,w);
+  //     char celement[10];
+  //     sprintf(celement, " %d", element);
+  //   grid+= celement;
+  //  }
+  //  grid += "\n";
+  // }
+  // std::cout << grid << std::endl;
 
-  grid = "";
-  for(int h=0+ halo_value; h < height + halo_value; h++) {
-   for(int w=0+ halo_value; w < width + halo_value; w++) {
-    int element = inputGrid(h,w);
-      char celement[10];
-      sprintf(celement, " %d", element);
-    grid+= celement;
-   }
-   grid += "\n";
-  }
-  std::cout << grid << std::endl;
+  // grid = "";
+  // for(int h=0+ halo_value; h < height + halo_value; h++) {
+  //  for(int w=0+ halo_value; w < width + halo_value; w++) {
+  //   int element = inputGrid(h,w);
+  //     char celement[10];
+  //     sprintf(celement, " %d", element);
+  //   grid+= celement;
+  //  }
+  //  grid += "\n";
+  // }
+  // std::cout << grid << std::endl;
 
 	
   stencil.~Stencil2D();

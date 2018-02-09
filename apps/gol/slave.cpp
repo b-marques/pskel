@@ -26,7 +26,7 @@ struct Arguments
 
 
 namespace PSkel{
-__parallel__ void stencilKernel(Array2D<int> input, Array2D<int> output,
+__parallel__ void stencilKernel(Array2D<int> &input, Array2D<int> &output,
     Mask2D<int> mask, Arguments args, size_t i, size_t j){
     int neighbors =  input(i-1,j-1) + input(i-1,j) + input(i-1,j+1)  +
                     input(i+1,j-1) + input(i+1,j) + input(i+1,j+1)  +

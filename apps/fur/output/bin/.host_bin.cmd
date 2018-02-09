@@ -1,1 +1,0 @@
-cmd_output/bin/host_bin :=  gcc -o output/bin/host_bin  output/build/host_bin_build/host_main.c.o      -lpthread -lm -lrt -lmppa_remote -lpcie -L/usr/local/k1tools/lib64 -L/home/lig-ext/marquesb/project/pskel/apps/fur/output/lib/host/ -Wl,-rpath=/usr/local/k1tools/lib64 

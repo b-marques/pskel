@@ -23,7 +23,7 @@ struct Arguments{
 };
 
 namespace PSkel{
-  __parallel__ void stencilKernel(Array2D<float> input,Array2D<float> output,Mask2D<float> mask, Arguments args, size_t i, size_t j){
+  __parallel__ void stencilKernel(Array2D<float> &input,Array2D<float> &output,Mask2D<float> mask, Arguments args, size_t i, size_t j){
       //printf("MaskGet(0): %f\n", mask.get(0, input, h, w));
       //printf("MaskGet(1): %f\n", mask.get(1, input, h, w));
       //printf("MaskGet(2): %f\n", mask.get(2, input, h, w));

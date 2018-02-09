@@ -102,7 +102,7 @@ __parallel__ void stencilKernel(Array<T1> input, Array<T1> output, Mask<T2> mask
  * \param[in] w width index for the current element to be processed.
  **/
 template<typename T1, typename T2, class Args>
-__parallel__ void stencilKernel(Array2D<T1> input, Array2D<T1> output, Mask2D<T2> mask, Args args, size_t h, size_t w);
+__parallel__ void stencilKernel(Array2D<T1> &input, Array2D<T1> &output, Mask2D<T2> mask, Args args, size_t h, size_t w);
 
 /**
  * Function signature of the stencil kernel for processing 3-dimensional arrays.
@@ -145,7 +145,7 @@ protected:
 
 	#ifndef MPPA_MASTER
 	// virtual void runOpenMP(Array in, Array out, size_t numThreads) = 0;
-  virtual void runOpenMP(Array in, Array out, size_t width, size_t height, size_t depth, size_t maskRange, size_t numThreads) = 0;
+  	virtual void runOpenMP(Array &in, Array &out, size_t width, size_t height, size_t depth, size_t maskRange, size_t numThreads) = 0;
 	#endif
 
 	#ifdef PSKEL_CUDA
@@ -338,7 +338,7 @@ public:
 	* \param[in] nb_tiles the number of tiles for the cluster to execute.
 	* \param[in] iterations the number of iterations for the execution.
 	**/
-	void runIterativeMPPA(Array in, Array out, int iterations, size_t numThreads);
+	void runIterativeMPPA(int iterations, size_t numThreads);
 	#endif
 };
 
@@ -379,7 +379,7 @@ protected:
 
 	#ifndef MPPA_MASTER
 	// void runOpenMP(Array in, Array out, size_t numThreads);
-  inline __attribute__((always_inline)) void runOpenMP(Array in, Array out, size_t width, size_t height, size_t depth, size_t maskRange, size_t numThreads);
+ 	inline __attribute__((always_inline)) void runOpenMP(Array &in, Array &out, size_t width, size_t height, size_t depth, size_t maskRange, size_t numThreads);
 	#endif
 
 	#ifdef PSKEL_TBB

@@ -311,6 +311,12 @@ namespace PSkel{
 
             double exec_time = 0;
             double comm_time = 0;
+            double clear_time = 0;
+            double segment_swap_time = 0;
+            double work_area_time = 0;
+            double computation_time = 0;
+            double barrier_time = 0;
+
 
             std::chrono::time_point<std::chrono::steady_clock> begin_exec = mppa_slave_get_time();
             std::chrono::time_point<std::chrono::steady_clock> begin_comm = mppa_slave_get_time();
@@ -335,6 +341,7 @@ namespace PSkel{
                 for(int i = height_offset; i < height && nb_tiles_aux; i+=this->input.getRealHeight()){
                     for(; j < width && nb_tiles_aux; j+=this->input.getRealWidth()){
                         
+                        std::chrono::time_point<std::chrono::steady_clock> work_area_time_aux = mppa_slave_get_time();
                         struct work_area_t work_area = {static_cast<int>(this->mask.getRange()),
                                                         static_cast<int>(this->mask.getRange()),
                                                         static_cast<int>(this->input.getWidth() - this->mask.getRange()),
@@ -364,6 +371,11 @@ namespace PSkel{
 
                         this->input.mppa_work_area(work_area);
                         this->output.mppa_work_area(work_area);
+                        work_area_time += mppa_slave_diff_time(work_area_time_aux, mppa_slave_get_time());
+
+                        std::chrono::time_point<std::chrono::steady_clock> clear_aux = mppa_slave_get_time();
+                        this->output.mppa_clear();
+                        clear_time += mppa_slave_diff_time(clear_aux, mppa_slave_get_time());
 
                         begin_comm = mppa_slave_get_time();
 
@@ -373,51 +385,23 @@ namespace PSkel{
                             width + static_cast<int>(this->input.getWidthOffset())*2, // xdim
                             height + static_cast<int>(this->input.getHeightOffset())*2, // ydim
                         };
-
-                        this->output.mppa_clear();
                         // printf("remote_point:\n%d\n%d\n%d\n%d\n", remote_point.xpos, remote_point.ypos, remote_point.xdim, remote_point.ydim);
                         this->input.mppa_get_block2d(&remote_point);
-
-                        // if(cluster_id == 12 ) {
-                        //     std::string grid;
-                        //     for(unsigned h = 0; h < this->input.getHeight() ; h++) {
-                        //      for(unsigned w = 0; w < this->input.getWidth() ;  w++) {
-                        //         int element = this->input(h,w);
-                        //         char celement[10];
-                        //         sprintf(celement, " %d", element);
-                        //         grid+= celement;
-                        //      }
-                        //      grid += "\n";
-                        //     }
-                        //     std::cout << grid << std::endl;
-                        // }
 
                         end_comm = mppa_slave_get_time();
                         comm_time += mppa_slave_diff_time(begin_comm, end_comm);
 
-                        // if (nb_tiles_aux == 1) {
-                        //     if(cluster_id == 15 ) {
-                        //         std::string grid;
-                        //         for(unsigned h = 0; h < this->input.getHeight() ; h++) {
-                        //          for(unsigned w = 0; w < this->input.getWidth() ;  w++) {
-                        //             int element = this->input(h,w);
-                        //             char celement[10];
-                        //             sprintf(celement, " %d", element);
-                        //             grid+= celement;
-                        //          }
-                        //          grid += "\n";
-                        //         }
-                        //         std::cout << grid << std::endl;
-                        //     } 
-                        // }
+                        std::chrono::time_point<std::chrono::steady_clock> computation_time_aux = mppa_slave_get_time();
+                        this->runIterativeMPPA(innerIterations, nb_threads);
+                        computation_time += mppa_slave_diff_time(computation_time_aux, mppa_slave_get_time());
 
-                        this->runIterativeMPPA(this->input, this->output, innerIterations, nb_threads);
-                        
+
                         begin_comm = mppa_slave_get_time();
                         remote_point.xpos += static_cast<int>(this->output.getWidthOffset());
                         remote_point.ypos += static_cast<int>(this->output.getHeightOffset());
                         
                         if(innerIterations % 2 == 0) {
+                            std::chrono::time_point<std::chrono::steady_clock> swap_time_aux = mppa_slave_get_time();
                             mppa_async_segment_t aux = this->input.mppa_segment();
                             this->input.mppa_segment(this->output.mppa_segment());
                             this->output.mppa_segment(aux);
@@ -427,6 +411,7 @@ namespace PSkel{
                             aux = this->input.mppa_segment();
                             this->input.mppa_segment(this->output.mppa_segment());
                             this->output.mppa_segment(aux);
+                            segment_swap_time += mppa_slave_diff_time(swap_time_aux, mppa_slave_get_time());
                         } else {
                             this->output.mppa_put_block2d(&remote_point);
                         } 
@@ -437,18 +422,27 @@ namespace PSkel{
                     }
                     j = 0; /* "reset" ypos of tile */
                 }
+                std::chrono::time_point<std::chrono::steady_clock> barrier_time_aux = mppa_slave_get_time();
                 mppa_rpc_barrier_all();
+                barrier_time += mppa_slave_diff_time(barrier_time_aux, mppa_slave_get_time());
+
+                std::chrono::time_point<std::chrono::steady_clock> swap_time_aux_2 = mppa_slave_get_time();
                 mppa_async_segment_t aux = this->input.mppa_segment();
                 this->input.mppa_segment(this->output.mppa_segment());
                 this->output.mppa_segment(aux);
+                segment_swap_time += mppa_slave_diff_time(swap_time_aux_2, mppa_slave_get_time());
             }
 
             std::chrono::time_point<std::chrono::steady_clock> end_exec = mppa_slave_get_time();
             exec_time = mppa_slave_diff_time(begin_exec, end_exec);
 
-
-            // cout<< "Slave Time: " << exec_time << endl;
-            // cout<< "Comm. Time: " << comm_time << endl;
+            cout<< "Slave Time: " << exec_time << endl;
+            cout<< "Comm. Time: " << comm_time << endl;
+            cout<< "Clear Time: " << clear_time << endl;
+            cout<< "Swap Time: " << segment_swap_time << endl;
+            cout<< "Work_Area Time: " << work_area_time << endl;
+            cout<< "Computation Time: " << computation_time << endl;
+            cout<< "Barrier Time: " << barrier_time << endl;
           
             mppa_async_final();
         }
@@ -456,12 +450,12 @@ namespace PSkel{
 #ifdef PSKEL_MPPA
 #ifndef MPPA_MASTER
     template<class Array, class Mask, class Args>
-        void StencilBase<Array, Mask,Args>::runIterativeMPPA(Array in, Array out, int iterations, size_t numThreads){
+        void StencilBase<Array, Mask,Args>::runIterativeMPPA(int iterations, size_t numThreads){
             size_t width = this->input.getWidth();
             size_t height = this->input.getHeight();
             size_t depth = this->input.getDepth();
             size_t maskRange = this->mask.getRange();
-            struct work_area_t work_area = in.mppa_work_area();
+            struct work_area_t work_area = this->input.mppa_work_area();
             for(int i = 0; i < iterations; i++) {
                 // if(__k1_get_cluster_id() == 15 ) {
                 //     std::cout << "iteration: " << i + 1 << std::endl;
@@ -471,9 +465,9 @@ namespace PSkel{
                 //     std::cout << "x_init: " << work_area.x_init << std::endl;
                 // }
                 if(i%2==0) {
-                    this->runOpenMP(in, out, width, height, depth, maskRange, numThreads);
+                    this->runOpenMP(this->input, this->output, width, height, depth, maskRange, numThreads);
                 } else {
-                    this->runOpenMP(out, in, width, height, depth, maskRange, numThreads);
+                    this->runOpenMP(this->output, this->input, width, height, depth, maskRange, numThreads);
                 }
 
                 /* Control top border */
@@ -501,8 +495,8 @@ namespace PSkel{
                     work_area.dist_to_border[3] -= maskRange;
                 }
 
-                in.mppa_work_area(work_area);
-                out.mppa_work_area(work_area);
+                this->input.mppa_work_area(work_area);
+                this->output.mppa_work_area(work_area);
 
                 // if(__k1_get_cluster_id() == 15 ) {
                 //     std::string grid;
@@ -1303,13 +1297,13 @@ namespace PSkel{
 
 #ifndef MPPA_MASTER
     template<class Array, class Mask, class Args>
-        inline __attribute__((always_inline)) void Stencil2D<Array,Mask,Args>::runOpenMP(Array in, Array out, size_t width, size_t height, size_t depth, size_t maskRange, size_t numThreads){
-            // omp_set_num_threads(numThreads);
+         inline __attribute__((always_inline))  void Stencil2D<Array,Mask,Args>::runOpenMP(Array &in, Array &out, size_t width, size_t height, size_t depth, size_t maskRange, size_t numThreads){
+            omp_set_num_threads(numThreads);
             struct work_area_t work_area = in.mppa_work_area();
-// #pragma omp parallel for
-            for (int h = work_area.y_init; h < work_area.y_final; h++){
-                for (int w = work_area.x_init; w < work_area.x_final; w++){
-                    stencilKernel(in,out,this->mask,this->args,h,w);
+#pragma omp parallel for
+            for (auto h = work_area.y_init; h < work_area.y_final; h++){
+                for (auto w = work_area.x_init; w < work_area.x_final; w++){
+                        stencilKernel(in,out,this->mask,this->args,h,w);
                     }}
         }
 #endif

@@ -15,7 +15,7 @@ COMPILE_OPTI := -O3
 cluster-bin := cluster_bin
 cluster-system := $(cluster_system)
 cluster_bin-srcs := slave.cpp ../../include/mppa_utils.cpp
-cluster-cppflags := -g -DMPPA_TRACE_ENABLE ${COMPILE_OPTI} -mhypervisor -I . -Wall -fopenmp -std=c++14
+cluster-cppflags := -g -DMPPA_TRACE_ENABLE ${COMPILE_OPTI} -mhypervisor -I . -Wall -fopenmp -std=c++14 
 cluster-lflags := -g -mhypervisor -lm -Wl,--defsym=USER_STACK_SIZE=0x2000 -Wl,--defsym=KSTACK_SIZE=0x1000 -lgomp
 ifeq ($(cluster_system), bare)
 cluster-lflags += -lvbsp -lutask -lmppa_remote -lmppa_async -lmppa_request_engine -lmppapower -lmppanoc -lmpparouting -Wl,--defsym=_LIBNOC_DISABLE_FIFO_FULL_CHECK=0
