@@ -44,6 +44,7 @@ int CalcSize(int level){
 
 
 int main(int argc, char **argv){
+	
 	int width, height, tilingHeight, tilingWidth, iterations, innerIterations, nb_clusters, nb_threads; //stencil size
 	if(argc != 9){
 		printf ("Wrong number of parameters.\n");
@@ -110,17 +111,17 @@ int main(int argc, char **argv){
         }
     }
 
-  // std::string grid;
-  // for(int h = 0+ halo_value; h < height + halo_value; h++) {
-  //  for(int w = 0 + halo_value; w < width + halo_value;  w++) {
-  //   int element = inputGrid(h,w);
-  //     char celement[10];
-  //     sprintf(celement, " %d", element);
-  //   grid+= celement;
-  //  }
-  //  grid += "\n";
-  // }
-  // std::cout << grid << std::endl;
+  std::string grid;
+  for(int h = 0+ halo_value; h < height + halo_value; h++) {
+   for(int w = 0 + halo_value; w < width + halo_value;  w++) {
+    int element = inputGrid(h,w);
+      char celement[10];
+      sprintf(celement, " %d", element);
+    grid+= celement;
+   }
+   grid += "\n";
+  }
+  std::cout << grid << std::endl;
 
 	//Instantiate Stencil 2D
 	Arguments arg;
@@ -129,18 +130,36 @@ int main(int argc, char **argv){
 
 	//Schedule computation to slaves
 
-  stencil.scheduleMPPA("cluster_bin", nb_clusters, nb_threads, width, height, tilingHeight, tilingWidth, iterations, innerIterations);
+  	stencil.scheduleMPPA("cluster_bin", nb_clusters, nb_threads, width, height, tilingHeight, tilingWidth, iterations, innerIterations);
 
-	//Print results
-	/*cout<<"OUTPUT"<<endl;
-	for(int i=0;i<width;i+=25){
-		for(int j=0; j<height;j+=25){
-			cout<<"("<<i    <<","<<j       <<") = "<<outputGrid(i,j)<<"\t\t";
-			cout<<"("<<width-1-i<<","<<height-1-j<<") = "<<outputGrid(width-1-i,height-1-j)<<endl;
+	int outter_iterations = ceil(float(iterations)/innerIterations);
+	if(outter_iterations %2 == 1) {
+		grid = "";
+		for(int h=0+ halo_value; h < height + halo_value; h++) {
+		 for(int w=0+ halo_value; w < width + halo_value; w++) {
+		 	int element = outputGrid(h,w);
+				char celement[10];
+				sprintf(celement, " %d", element);
+		 	grid+= celement;
+		 }
+		 grid += "\n";
 		}
+		std::cout << "printing output" << std::endl;
+		std::cout << grid << std::endl;
+	} else { 
+		grid = "";
+		for(int h=0+ halo_value; h < height + halo_value; h++) {
+		 for(int w=0+ halo_value; w < width + halo_value; w++) {
+		 	int element = inputGrid(h,w);
+				char celement[10];
+				sprintf(celement, " %d", element);
+		 	grid+= celement;
+		 }
+		 grid += "\n";
+		}
+		std::cout << "printing input" << std::endl;
+		std::cout << grid << std::endl;
 	}
-	*/
-
   // grid = "";
   // for(int h=0+ halo_value; h < height + halo_value; h++) {
   //  for(int w=0+ halo_value; w < width + halo_value; w++) {

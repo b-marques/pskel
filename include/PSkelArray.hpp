@@ -331,10 +331,8 @@ void ArrayBase<T>::mppa_get_block2d(const mppa_async_point2d_t *remote_point) {
  //      }
  //      grid += "\n";
  //  }
-  // if (id == 13){
-  	// std::cout << "width :" <<this->width << "    height: "<< this->height << std::endl;
-  	// std::cout << grid << std::endl;
-  // }
+ //  	// std::cout << "width :" <<this->width << "    height: "<< this->height << std::endl;
+ //  	std::cout << grid << std::endl;
 
 }
 #endif

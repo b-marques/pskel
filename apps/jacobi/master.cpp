@@ -59,17 +59,17 @@ int main(int argc, char **argv){
 		}
 	}
 
-	// std::string grid;
- // for(int h = 0+ halo_value; h < height + halo_value; h++) {
- //   for(int w = 0 + halo_value; w < width + halo_value;  w++) {
- //   	int element = inputGrid(h,w);
-	// 		char celement[10];
-	// 		sprintf(celement, " %d", element);
- //   	grid+= celement;
- //   }
- //   grid += "\n";
-	// }
-	// std::cout << grid << std::endl;
+	std::string grid;
+ for(int h = 0+ halo_value; h < height + halo_value; h++) {
+   for(int w = 0 + halo_value; w < width + halo_value;  w++) {
+   	float element = inputGrid(h,w);
+			char celement[30];
+			sprintf(celement, " %f", element);
+   	grid+= celement;
+   }
+   grid += "\n";
+	}
+	std::cout << grid << std::endl;
 
 	//Instantiate Stencil 2D
 	Stencil2D<Array2D<float>, Mask2D<float>, float> stencil(inputGrid, outputGrid, mask, factor);
@@ -101,6 +101,35 @@ int main(int argc, char **argv){
 	//  grid += "\n";
 	// }
 	// std::cout << grid << std::endl;
+
+	int outter_iterations = ceil(float(iterations)/innerIterations);
+	if(outter_iterations %2 == 1) {
+		grid = "";
+		for(int h=0+ halo_value; h < height + halo_value; h++) {
+		 for(int w=0+ halo_value; w < width + halo_value; w++) {
+		 	float element = outputGrid(h,w);
+				char celement[30];
+				sprintf(celement, " %f", element);
+		 	grid+= celement;
+		 }
+		 grid += "\n";
+		}
+		std::cout << "printing output" << std::endl;
+		std::cout << grid << std::endl;
+	} else { 
+		grid = "";
+		for(int h=0+ halo_value; h < height + halo_value; h++) {
+		 for(int w=0+ halo_value; w < width + halo_value; w++) {
+		 	float element = inputGrid(h,w);
+				char celement[10];
+				sprintf(celement, " %f", element);
+		 	grid+= celement;
+		 }
+		 grid += "\n";
+		}
+		std::cout << "printing input" << std::endl;
+		std::cout << grid << std::endl;
+	}
 
 
 	// grid = "";

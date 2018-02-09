@@ -436,13 +436,13 @@ namespace PSkel{
             std::chrono::time_point<std::chrono::steady_clock> end_exec = mppa_slave_get_time();
             exec_time = mppa_slave_diff_time(begin_exec, end_exec);
 
-            cout<< "Slave Time: " << exec_time << endl;
-            cout<< "Comm. Time: " << comm_time << endl;
-            cout<< "Clear Time: " << clear_time << endl;
-            cout<< "Swap Time: " << segment_swap_time << endl;
-            cout<< "Work_Area Time: " << work_area_time << endl;
-            cout<< "Computation Time: " << computation_time << endl;
-            cout<< "Barrier Time: " << barrier_time << endl;
+            // cout<< "Slave Time: " << exec_time << endl;
+            // cout<< "Comm. Time: " << comm_time << endl;
+            // cout<< "Clear Time: " << clear_time << endl;
+            // cout<< "Swap Time: " << segment_swap_time << endl;
+            // cout<< "Work_Area Time: " << work_area_time << endl;
+            // cout<< "Computation Time: " << computation_time << endl;
+            // cout<< "Barrier Time: " << barrier_time << endl;
           
             mppa_async_final();
         }
@@ -708,14 +708,14 @@ namespace PSkel{
                     this->runTBB(inputCopy, this->output, numThreads);
 #else
                     // this->runOpenMP(inputCopy, this->output, numThreads);
-                    this->runOpenMP(input, this->output, width, height, depth, maskRange, numThreads);
+                    this->runOpenMP(this->input, this->output, width, height, depth, maskRange, numThreads);
 #endif
                 }else {
 #ifdef PSKEL_TBB
                     this->runTBB(this->output, inputCopy, numThreads);
 #else
                     // this->runOpenMP(this->output, inputCopy, numThreads);
-                    this->runOpenMP(this->output, input, width, height, depth, maskRange, numThreads);
+                    this->runOpenMP(this->output, this->input, width, height, depth, maskRange, numThreads);
 #endif
                 }
             }
@@ -1298,6 +1298,7 @@ namespace PSkel{
 #ifndef MPPA_MASTER
     template<class Array, class Mask, class Args>
          inline __attribute__((always_inline))  void Stencil2D<Array,Mask,Args>::runOpenMP(Array &in, Array &out, size_t width, size_t height, size_t depth, size_t maskRange, size_t numThreads){
+#ifdef MPPA_SLAVE
             omp_set_num_threads(numThreads);
             struct work_area_t work_area = in.mppa_work_area();
 #pragma omp parallel for
@@ -1306,7 +1307,19 @@ namespace PSkel{
                         stencilKernel(in,out,this->mask,this->args,h,w);
                     }}
         }
-#endif
+#endif // MPPA_SLAVE
+
+#ifndef MPPA_SLAVE
+            omp_set_num_threads(numThreads);
+#pragma omp parallel for
+            for (int h = 0; h < in.getHeight(); h++){
+                for (int w = 0; w < in.getWidth(); w++){
+                    stencilKernel(in,out,this->mask,this->args,h,w);
+                    }}
+        }    
+#endif // MPPA_SLAVE
+
+#endif // MPPA_MASTER
 
 #ifdef PSKEL_TBB
     template<class Array, class Mask, class Args>
