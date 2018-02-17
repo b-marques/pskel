@@ -58,9 +58,9 @@ public:
 	
 	Args(int _width);
 	
-	__device__ __host__ int getWidth() const;
+	int getWidth() const;
 	
-	__device__ __host__ T & operator()(int x) const;
+	T & operator()(int x) const;
 };
 
 //*******************************************************************************************
@@ -84,13 +84,13 @@ public:
 	}
 	*/
 	
-	Args2D(int _width,int _height);
+	Args2D(int _width,int _height, int halo_value);
 	
-	__device__ __host__ int getWidth() const;
+	int getWidth() const;
 	
-	__device__ __host__ int getHeight() const;
+	int getHeight() const;
 	
-	__device__ __host__ T & operator()(int x,int y) const;
+	T & operator()(int x,int y) const;
 };
 
 //*******************************************************************************************
@@ -116,13 +116,13 @@ public:
 	
 	Args3D(int _width, int _height, int _depth);
 	
-	__device__ __host__ int getWidth() const;
+	int getWidth() const;
 	
-	__device__ __host__ int getHeight() const;
+	int getHeight() const;
 	
-	__device__ __host__ int getDepth() const;	
+	int getDepth() const;	
 	
-	__device__ __host__ T & operator()(int x,int y,int z) const;
+	T & operator()(int x,int y,int z) const;
 };
 
 }//end namespace

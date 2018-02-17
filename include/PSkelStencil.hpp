@@ -317,7 +317,6 @@ namespace PSkel{
             double computation_time = 0;
             double barrier_time = 0;
 
-
             std::chrono::time_point<std::chrono::steady_clock> begin_exec = mppa_slave_get_time();
             std::chrono::time_point<std::chrono::steady_clock> begin_comm = mppa_slave_get_time();
             this->input.mppa_segment_clone(1);
@@ -387,6 +386,21 @@ namespace PSkel{
                         };
                         // printf("remote_point:\n%d\n%d\n%d\n%d\n", remote_point.xpos, remote_point.ypos, remote_point.xdim, remote_point.ydim);
                         this->input.mppa_get_block2d(&remote_point);
+
+
+                        // if(cluster_id == 0) {
+                        //     std::string grid;
+                        //   for(int h = 0; h < input.getHeight(); h++) {
+                        //    for(int w = 0; w < input.getWidth();  w++) {
+                        //     float element = this->input(h,w);
+                        //       char celement[10];
+                        //       sprintf(celement, " %.2f", element);
+                        //     grid+= celement;
+                        //    }
+                        //    grid += "\n";
+                        //   }
+                        //   std::cout << grid << std::endl;
+                        // }
 
                         end_comm = mppa_slave_get_time();
                         comm_time += mppa_slave_diff_time(begin_comm, end_comm);
@@ -1316,10 +1330,10 @@ namespace PSkel{
                 for (int w = 0; w < in.getWidth(); w++){
                     stencilKernel(in,out,this->mask,this->args,h,w);
                     }}
-        }    
+        }
 #endif // MPPA_SLAVE
-
 #endif // MPPA_MASTER
+
 
 #ifdef PSKEL_TBB
     template<class Array, class Mask, class Args>

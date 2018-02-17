@@ -307,6 +307,9 @@ void ArrayBase<T>::mppa_get_block2d(const mppa_async_point2d_t *remote_point) {
     (int)this->height,             // ydim
   };
 
+  // printf("remote_point:\n%d\n%d\n%d\n%d\n", remote_point->xpos, remote_point->ypos, remote_point->xdim, remote_point->ydim);
+  // printf("local_point:\n%d\n%d\n%d\n%d\n", local_point.xpos, local_point.ypos, local_point.xdim, local_point.ydim);
+
 	assert(mppa_async_sget_block2d(this->mppaArray, 
 																 &(this->mppa_segment_),
 																 0, sizeof(T), this->width, this->height,
@@ -320,18 +323,19 @@ void ArrayBase<T>::mppa_get_block2d(const mppa_async_point2d_t *remote_point) {
 	// std::string sid(ssid);
 	// std::string grid;
 
- //  for(unsigned h=0;h<this->height; h++) {
- //  		grid+="inputGrid-slave["+sid+"] = ";
- //      for(unsigned w=0;w<this->width; w++) {
- //      	int element = mppaArray[h*width + w];
-	// 			char celement[5];
-	// 			sprintf(celement, "%d", element);
-	// 			std::string selement(celement);
- //      	grid+= " " + selement;
- //      }
- //      grid += "\n";
- //  }
- //  	// std::cout << "width :" <<this->width << "    height: "<< this->height << std::endl;
+	// if(__k1_get_cluster_id() == 0) {
+	//   for(unsigned h=0;h<this->height; h++) {
+	//       for(unsigned w=0;w<this->width; w++) {
+	//       	int element = mppaArray[h*width + w];
+	// 				char celement[5];
+	// 				sprintf(celement, " %d", element);
+	// 				std::string selement(celement);
+	//       	grid+= " " + selement;
+	//       }
+	//       grid += "\n";
+	//   }
+	// }
+  // std::cout << "width :" <<this->width << "    height: "<< this->height << std::endl;
  //  	std::cout << grid << std::endl;
 
 }

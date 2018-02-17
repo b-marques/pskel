@@ -50,10 +50,6 @@ Args<T>::Args(){};
 template<typename T>
 Args<T>::Args(int _width){
 	width = _width;
-	gpuErrchk( cudaDeviceReset() );
-	gpuErrchk( cudaSetDeviceFlags(cudaDeviceMapHost) );
-	gpuErrchk( cudaHostAlloc((void **) &hostArray, width*sizeof(T), cudaHostAllocWriteCombined | cudaHostAllocMapped) );
-	gpuErrchk( cudaHostGetDevicePointer(&deviceArray, hostArray, 0) );
 }
 	
 template<typename T>
@@ -84,11 +80,10 @@ Args2D<T>::Args2D(){};
 	*/
 	
 template<typename T>
-Args2D<T>::Args2D(int _width,int _height){
-	width = _width;
-	height = _height;
-	gpuErrchk( cudaHostAlloc((void **) &hostArray, width*height*sizeof(T), cudaHostAllocWriteCombined | cudaHostAllocMapped) );
-	gpuErrchk( cudaHostGetDevicePointer(&deviceArray, hostArray, 0) );
+Args2D<T>::Args2D(int _width,int _height, int halo_value){
+	width = _width+halo_value*2;
+	height = _height+halo_value*2;
+	this->hostArray = (T*) calloc(width*height, sizeof(T));
 }
 	
 template<typename T>
@@ -128,8 +123,6 @@ Args3D<T>::Args3D(int _width, int _height, int _depth){
 	width = _width;
 	height = _height;
 	depth = _depth;
-	gpuErrchk( cudaHostAlloc((void **) &hostArray, width*height*depth*sizeof(T), cudaHostAllocWriteCombined | cudaHostAllocMapped) );
-	gpuErrchk( cudaHostGetDevicePointer(&deviceArray, hostArray, 0) );
 }
 	
 template<typename T>

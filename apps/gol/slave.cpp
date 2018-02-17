@@ -4,6 +4,11 @@
 
 #define PSKEL_MPPA
 #define MPPA_SLAVE
+
+#include "../../include/mppa_utils.h"
+#include "../../include/PSkel.h"
+
+
 // #define DEBUG
 //#define BUG_TEST
 // #define PRINT_OUT
@@ -12,8 +17,6 @@
 // #define BARRIER_SYNC_MASTER "/mppa/sync/128:1"
 // #define BARRIER_SYNC_SLAVE "/mppa/sync/[0..15]:2"
 //#include "common.h"
-#include "../../include/mppa_utils.h"
-#include "../../include/PSkel.h"
 
 using namespace std;
 using namespace PSkel;
@@ -26,8 +29,7 @@ struct Arguments
 
 
 namespace PSkel{
-__parallel__ void stencilKernel(Array2D<int> &input, Array2D<int> &output,
-    Mask2D<int> mask, Arguments args, size_t i, size_t j){
+__parallel__ void stencilKernel(Array2D<int> &input, Array2D<int> &output, Mask2D<int> mask, Arguments args, size_t i, size_t j){
     int neighbors =  input(i-1,j-1) + input(i-1,j) + input(i-1,j+1)  +
                     input(i+1,j-1) + input(i+1,j) + input(i+1,j+1)  +
                     input(i,j-1)   + input(i,j+1) ;

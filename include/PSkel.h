@@ -79,7 +79,9 @@ runtime details.
 #include <omp.h>
 #endif
 //#include <papi.h>
-
+#ifdef PSKEL_MPPA
+	#include "PSkelArgs.h"
+#endif
 #include "PSkelDefs.h"
 #include "PSkelArray.h"
 #ifdef PSKEL_CUDA
