@@ -72,8 +72,8 @@ private:
 	#endif
 	#ifdef PSKEL_MPPA
 	T *mppaArray;
-  	mppa_async_segment_t mppa_segment_;
-  	struct work_area_t mppa_work_area_;
+  	mppa_async_segment_t* mppa_segment_;
+  	struct work_area_t* mppa_work_area_;
  	//T *comm_buffer;
 	#endif
 
@@ -302,19 +302,19 @@ public:
 	#endif
 
 	#ifdef PSKEL_MPPA
-	void mppa_segment(const mppa_async_segment_t mppa_segment);
+	void mppa_segment(mppa_async_segment_t* mppa_segment);
 	#endif
 
 	#ifdef PSKEL_MPPA
-	mppa_async_segment_t mppa_segment();
+	mppa_async_segment_t* mppa_segment();
 	#endif
 
 	#ifdef PSKEL_MPPA
-	void mppa_work_area(const struct work_area_t work_area);
+	void mppa_work_area(struct work_area_t* work_area);
 	#endif
 
 	#ifdef PSKEL_MPPA
-	struct work_area_t mppa_work_area();
+	struct work_area_t* mppa_work_area();
 	#endif
 
 	#ifdef PSKEL_MPPA

@@ -341,31 +341,31 @@ namespace PSkel{
                     for(; j < width && nb_tiles_aux; j+=this->input.getRealWidth()){
                         
                         std::chrono::time_point<std::chrono::steady_clock> work_area_time_aux = mppa_slave_get_time();
-                        struct work_area_t work_area = {static_cast<int>(this->mask.getRange()),
+                        struct work_area_t* work_area = new work_area_t(static_cast<int>(this->mask.getRange()),
                                                         static_cast<int>(this->mask.getRange()),
                                                         static_cast<int>(this->input.getWidth() - this->mask.getRange()),
                                                         static_cast<int>(this->input.getHeight() - this->mask.getRange()),
-                                                        {0,0,0,0}};
+                                                        {0,0,0,0});
 
                         /* Top border */
                         if (static_cast<int>(i - this->input.getHeightOffset()) < 0) {
-                            work_area.y_init = static_cast<int>(-(i-this->input.getHeightOffset()));
-                            work_area.dist_to_border[0] = static_cast<int>(-(i - this->input.getHeightOffset()) - this->mask.getRange());
+                            work_area->y_init = static_cast<int>(-(i-this->input.getHeightOffset()));
+                            work_area->dist_to_border[0] = static_cast<int>(-(i - this->input.getHeightOffset()) - this->mask.getRange());
                         }
                         /* Rigth border*/
                         if (static_cast<int>(j + this->input.getRealWidth() + this->input.getWidthOffset() - width)  > 0) {
-                            work_area.x_final = static_cast<int>(this->input.getWidth() - (j + this->input.getRealWidth() + this->input.getWidthOffset() - width));
-                            work_area.dist_to_border[1] = static_cast<int>((j + this->input.getRealWidth() + this->input.getWidthOffset() - width) - this->mask.getRange());
+                            work_area->x_final = static_cast<int>(this->input.getWidth() - (j + this->input.getRealWidth() + this->input.getWidthOffset() - width));
+                            work_area->dist_to_border[1] = static_cast<int>((j + this->input.getRealWidth() + this->input.getWidthOffset() - width) - this->mask.getRange());
                         }
                         /* Bottom border */
                         if (static_cast<int>(i + this->input.getRealHeight() + this->input.getHeightOffset() - height) > 0) {
-                            work_area.y_final = static_cast<int>(this->input.getHeight() - (i + this->input.getRealHeight() + this->input.getHeightOffset() - height));
-                            work_area.dist_to_border[2] = static_cast<int>((i + this->input.getRealHeight() + this->input.getHeightOffset() - height) - this->mask.getRange());
+                            work_area->y_final = static_cast<int>(this->input.getHeight() - (i + this->input.getRealHeight() + this->input.getHeightOffset() - height));
+                            work_area->dist_to_border[2] = static_cast<int>((i + this->input.getRealHeight() + this->input.getHeightOffset() - height) - this->mask.getRange());
                         }
                         /* Left border */
                         if(static_cast<int>(j - this->input.getWidthOffset()) < 0) {
-                            work_area.x_init = static_cast<int>(-(j-this->input.getWidthOffset()));
-                            work_area.dist_to_border[3] = static_cast<int>((-(j-this->input.getWidthOffset())) - this->mask.getRange());
+                            work_area->x_init = static_cast<int>(-(j-this->input.getWidthOffset()));
+                            work_area->dist_to_border[3] = static_cast<int>((-(j-this->input.getWidthOffset())) - this->mask.getRange());
                         }
 
                         this->input.mppa_work_area(work_area);
@@ -416,15 +416,12 @@ namespace PSkel{
                         
                         if(innerIterations % 2 == 0) {
                             std::chrono::time_point<std::chrono::steady_clock> swap_time_aux = mppa_slave_get_time();
-                            mppa_async_segment_t aux = this->input.mppa_segment();
+                            mppa_async_segment_t* aux = this->input.mppa_segment();
                             this->input.mppa_segment(this->output.mppa_segment());
-                            this->output.mppa_segment(aux);
                             
                             this->input.mppa_put_block2d(&remote_point);
 
-                            aux = this->input.mppa_segment();
-                            this->input.mppa_segment(this->output.mppa_segment());
-                            this->output.mppa_segment(aux);
+                            this->input.mppa_segment(aux);
                             segment_swap_time += mppa_slave_diff_time(swap_time_aux, mppa_slave_get_time());
                         } else {
                             this->output.mppa_put_block2d(&remote_point);
@@ -433,6 +430,7 @@ namespace PSkel{
                         comm_time += mppa_slave_diff_time(begin_comm, end_comm);
 
                         --nb_tiles_aux;
+                        delete work_area;
                     }
                     j = 0; /* "reset" ypos of tile */
                 }
@@ -441,7 +439,7 @@ namespace PSkel{
                 barrier_time += mppa_slave_diff_time(barrier_time_aux, mppa_slave_get_time());
 
                 std::chrono::time_point<std::chrono::steady_clock> swap_time_aux_2 = mppa_slave_get_time();
-                mppa_async_segment_t aux = this->input.mppa_segment();
+                mppa_async_segment_t* aux = this->input.mppa_segment();
                 this->input.mppa_segment(this->output.mppa_segment());
                 this->output.mppa_segment(aux);
                 segment_swap_time += mppa_slave_diff_time(swap_time_aux_2, mppa_slave_get_time());
@@ -469,14 +467,14 @@ namespace PSkel{
             size_t height = this->input.getHeight();
             size_t depth = this->input.getDepth();
             size_t maskRange = this->mask.getRange();
-            struct work_area_t work_area = this->input.mppa_work_area();
+            struct work_area_t* work_area = this->input.mppa_work_area();
             for(int i = 0; i < iterations; i++) {
                 // if(__k1_get_cluster_id() == 15 ) {
                 //     std::cout << "iteration: " << i + 1 << std::endl;
-                //     std::cout << "y_init: " << work_area.y_init << std::endl;
-                //     std::cout << "x_final: " << work_area.x_final << std::endl;
-                //     std::cout << "y_final: " << work_area.y_final << std::endl;
-                //     std::cout << "x_init: " << work_area.x_init << std::endl;
+                //     std::cout << "y_init: " << work_area->y_init << std::endl;
+                //     std::cout << "x_final: " << work_area->x_final << std::endl;
+                //     std::cout << "y_final: " << work_area->y_final << std::endl;
+                //     std::cout << "x_init: " << work_area->x_init << std::endl;
                 // }
                 if(i%2==0) {
                     this->runOpenMP(this->input, this->output, width, height, depth, maskRange, numThreads);
@@ -485,32 +483,32 @@ namespace PSkel{
                 }
 
                 /* Control top border */
-                if(!work_area.dist_to_border[0]) {
-                    work_area.y_init += maskRange;
+                if(!work_area->dist_to_border[0]) {
+                    work_area->y_init += maskRange;
                 } else {
-                    work_area.dist_to_border[0] -= maskRange;
+                    work_area->dist_to_border[0] -= maskRange;
                 }
                 /* Control right border */
-                if(!work_area.dist_to_border[1]) {
-                    work_area.x_final -= maskRange;
+                if(!work_area->dist_to_border[1]) {
+                    work_area->x_final -= maskRange;
                 } else {
-                    work_area.dist_to_border[1] -= maskRange;
+                    work_area->dist_to_border[1] -= maskRange;
                 }
                 /* Control bottom border */
-                if(!work_area.dist_to_border[2]) {
-                    work_area.y_final -= maskRange;
+                if(!work_area->dist_to_border[2]) {
+                    work_area->y_final -= maskRange;
                 } else {
-                    work_area.dist_to_border[2] -= maskRange;
+                    work_area->dist_to_border[2] -= maskRange;
                 }
                 /* Control left border */
-                if(!work_area.dist_to_border[3]) {
-                    work_area.x_init += maskRange;
+                if(!work_area->dist_to_border[3]) {
+                    work_area->x_init += maskRange;
                 } else {
-                    work_area.dist_to_border[3] -= maskRange;
+                    work_area->dist_to_border[3] -= maskRange;
                 }
 
-                this->input.mppa_work_area(work_area);
-                this->output.mppa_work_area(work_area);
+                // this->input.mppa_work_area(work_area);
+                // this->output.mppa_work_area(work_area);
 
                 // if(__k1_get_cluster_id() == 15 ) {
                 //     std::string grid;
@@ -1314,10 +1312,10 @@ namespace PSkel{
          inline __attribute__((always_inline))  void Stencil2D<Array,Mask,Args>::runOpenMP(Array &in, Array &out, size_t width, size_t height, size_t depth, size_t maskRange, size_t numThreads){
 #ifdef MPPA_SLAVE
             omp_set_num_threads(numThreads);
-            struct work_area_t work_area = in.mppa_work_area();
+            struct work_area_t* work_area = in.mppa_work_area();
 #pragma omp parallel for
-            for (auto h = work_area.y_init; h < work_area.y_final; h++){
-                for (auto w = work_area.x_init; w < work_area.x_final; w++){
+            for (auto h = work_area->y_init; h < work_area->y_final; h++){
+                for (auto w = work_area->x_init; w < work_area->x_final; w++){
                         stencilKernel(in,out,this->mask,this->args,h,w);
                     }}
         }
