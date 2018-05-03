@@ -139,55 +139,16 @@ namespace PSkel{
 
 #ifdef MPPA_MASTER
     template<class Array, class Mask, class Args>
-    void StencilBase<Array, Mask,Args>::mppa_init_io_cluster(int nb_clusters, mppadesc_t &pcie_fd)
+    void StencilBase<Array, Mask,Args>::mppa_init_io_cluster(int nb_clusters)
     {
-        /*******************************************************************************
-         *          IO CLUSTER INITIALIZATION CODE                                
-         *          !!!! DO NOT MODIFY !!!!
-         *******************************************************************************
-         * This code is in charge of:
-         *   - Initializing PCIe
-         *   - Initializing RPC server running on the IO
-         *   - Initializing Asynchronous copy server
-         *   - Initializing Syscall remoting library
-         *   - Initializing and loading MPPA Cluster with binary application
-         *******************************************************************************/
-        pcie_fd = 0;
-        if (__k1_spawn_type() == __MPPA_PCI_SPAWN) {
-            pcie_fd = pcie_open();
-            pcie_queue_init(pcie_fd);
-            pcie_register_console(pcie_fd, stdin, stdout);
-        }
         mppa_rpc_server_init(1, 0, nb_clusters);
         mppa_async_server_init();
-        mppa_remote_server_init(pcie_fd, nb_clusters);          
-    }
-
-    template<class Array, class Mask, class Args>
-    void StencilBase<Array, Mask,Args>::mppa_end_io_cluster(mppadesc_t &pcie_fd)
-    {
-        /*******************************************************************************
-         *          IO CLUSTER END CODE                                
-         *          !!!! DO NOT MODIFY !!!!
-         *******************************************************************************
-         * This code is in charge of:
-         *   - Destroying the PCIe queue
-         *   - Destroying theSyscall remoting library
-         *******************************************************************************/
-
-        /* Send an exit message on pcie interface */
-        if (__k1_spawn_type() == __MPPA_PCI_SPAWN) {
-            int remote_status;
-            pcie_queue_barrier(pcie_fd, 0, &remote_status);
-            pcie_unregister_console(pcie_fd);
-            pcie_queue_exit(pcie_fd, 0, NULL);
-        }         
     }
 #endif //MPPA_MASTER       
 
 #ifdef MPPA_MASTER
     template<class Array, class Mask, class Args>
-        void StencilBase<Array, Mask,Args>::spawn_slaves(const char slave_bin_name[], size_t width, size_t height, size_t tiling_height, size_t tiling_width, int nb_clusters, int nb_threads, int iterations, int inner_iterations, mppadesc_t &pcie_fd){
+        void StencilBase<Array, Mask,Args>::spawn_slaves(const char slave_bin_name[], size_t width, size_t height, size_t tiling_height, size_t tiling_width, int nb_clusters, int nb_threads, int iterations, int inner_iterations){
             
             // Prepare arguments to send to slaves
             int cluster_id;
@@ -229,7 +190,7 @@ namespace PSkel{
             argv_slave[12] = NULL;
 
 
-            this->mppa_init_io_cluster(nb_clusters, pcie_fd);
+            this->mppa_init_io_cluster(nb_clusters);
 
             int nb_computated_tiles = 0;
             // Spawn slave processes
@@ -251,7 +212,8 @@ namespace PSkel{
             utask_t t;
             utask_create(&t, NULL, (void* (*)(void*))mppa_rpc_server_start, NULL);
 
-            //assert(mppa_async_segment_create(&segment, 1, buffer, 16*sizeof(int), 0, 0, NULL) == 0);
+            this->input.mppa_segment_create(1);
+            this->output.mppa_segment_create(2);
 
             for (auto i = 0; i < ARGC_SLAVE; ++i)
                 free(argv_slave[i]);
@@ -261,7 +223,7 @@ namespace PSkel{
 
 #ifdef MPPA_MASTER
     template<class Array, class Mask, class Args>
-        void StencilBase<Array, Mask,Args>::waitSlaves(int nb_clusters, int tilingHeight, int tilingWidth, mppadesc_t &pcie_fd) {
+        void StencilBase<Array, Mask,Args>::waitSlaves(int nb_clusters, int tilingHeight, int tilingWidth) {
             size_t hTiling = ceil(float(this->input.getHeight())/float(tilingHeight));
             size_t wTiling = ceil(float(this->input.getHeight())/float(tilingWidth));
             size_t totalSize = float(hTiling*wTiling);
@@ -281,10 +243,7 @@ namespace PSkel{
             if(status != 0)
                 exit(-1);
 
-            // assert(mppa_async_segment_destroy(&segment) == 0);
-
-            this->mppa_end_io_cluster(pcie_fd);
-        
+            // assert(mppa_async_segment_destroy(&segment) == 0);        
         }
 #endif //MPPA_MASTER
 
@@ -292,11 +251,9 @@ namespace PSkel{
 #ifdef MPPA_MASTER
     template<class Array, class Mask, class Args>
         void StencilBase<Array, Mask,Args>::scheduleMPPA(const char slave_bin_name[], int nb_clusters, int nb_threads, size_t width, size_t height, size_t tilingHeight, size_t tilingWidth, int iterations, int innerIterations){
-
-            mppadesc_t pcie_fd;
-            this->spawn_slaves(slave_bin_name, width, height, tilingHeight, tilingWidth, nb_clusters, nb_threads, iterations, innerIterations, pcie_fd);
+            this->spawn_slaves(slave_bin_name, width, height, tilingHeight, tilingWidth, nb_clusters, nb_threads, iterations, innerIterations);
             //this->mppaSlice(tilingHeight, tilingWidth, nb_clusters, iterations, innerIterations);
-            this->waitSlaves(nb_clusters, tilingHeight, tilingWidth, pcie_fd);
+            this->waitSlaves(nb_clusters, tilingHeight, tilingWidth);
 
         }
 #endif //MPPA_MASTER
@@ -307,7 +264,6 @@ namespace PSkel{
         void StencilBase<Array, Mask,Args>::runMPPA(int cluster_id, int nb_threads, int nb_tiles, int outterIterations, int innerIterations, int itMod, int nb_clusters, int width, int height, int nb_computated_tiles){
             mppa_rpc_client_init();
             mppa_async_init();
-            mppa_remote_client_init();
 
             double exec_time = 0;
             double comm_time = 0;
@@ -448,13 +404,13 @@ namespace PSkel{
             std::chrono::time_point<std::chrono::steady_clock> end_exec = mppa_slave_get_time();
             exec_time = mppa_slave_diff_time(begin_exec, end_exec);
 
-            // cout<< "Slave Time: " << exec_time << endl;
-            // cout<< "Comm. Time: " << comm_time << endl;
-            // cout<< "Clear Time: " << clear_time << endl;
-            // cout<< "Swap Time: " << segment_swap_time << endl;
-            // cout<< "Work_Area Time: " << work_area_time << endl;
-            // cout<< "Computation Time: " << computation_time << endl;
-            // cout<< "Barrier Time: " << barrier_time << endl;
+            cout<< "Slave Time: " << exec_time << endl;
+            cout<< "Comm. Time: " << comm_time << endl;
+            cout<< "Clear Time: " << clear_time << endl;
+            cout<< "Swap Time: " << segment_swap_time << endl;
+            cout<< "Work_Area Time: " << work_area_time << endl;
+            cout<< "Computation Time: " << computation_time << endl;
+            cout<< "Barrier Time: " << barrier_time << endl;
           
             mppa_async_final();
         }
@@ -1263,10 +1219,6 @@ namespace PSkel{
             this->output = _output;
             this->args = _args;
             this->mask = _mask;
-            #ifdef MPPA_MASTER
-            this->input.mppa_segment_create(1);
-            this->output.mppa_segment_create(2);
-            #endif
         }
 
     template<class Array, class Mask, class Args>
@@ -1274,10 +1226,6 @@ namespace PSkel{
             this->input = _input;
             this->output = _output;
             this->mask = _mask;
-            #ifdef MPPA_MASTER
-            this->input.mppa_segment_create(1);
-            this->output.mppa_segment_create(2);
-            #endif 
         }
 
 

@@ -273,11 +273,7 @@ public:
 	/**
 	 * Initialization of IO CLuster and Async Communication.
 	 **/
-	void mppa_init_io_cluster(int nb_clusters, mppadesc_t &pcie_fd);
-	/**
-	 * End of IO CLuster and Async Communication.
-	 **/
-	void mppa_end_io_cluster(mppadesc_t &pcie_fd);
+	void mppa_init_io_cluster(int nb_clusters);
 	#endif // MPPA_MASTER
 
 	#ifdef MPPA_MASTER
@@ -288,7 +284,7 @@ public:
 	 * \param[in] nb_clusters the number of clusters to be spawn.
 	 * \param[in] nb_threads the number of threads per cluster.
 	 **/
-	void spawn_slaves(const char slave_bin_name[], size_t width, size_t height, size_t tilingHeight, size_t tilingWidth, int nb_clusters, int nb_threads, int iterations, int innerIterations, mppadesc_t &pcie_fd);
+	void spawn_slaves(const char slave_bin_name[], size_t width, size_t height, size_t tilingHeight, size_t tilingWidth, int nb_clusters, int nb_threads, int iterations, int innerIterations);
 	#endif
 
 	#ifdef MPPA_MASTER
@@ -305,7 +301,7 @@ public:
 	* wait for the slaves to complete.
 	* \param[in] nb_clusters the number of clusters to wait.
 	**/
-	void waitSlaves(int nb_clusters, int tilingHeight, int tilingWidth, mppadesc_t &pcie_fd);
+	void waitSlaves(int nb_clusters, int tilingHeight, int tilingWidth);
 	#endif
 
 	#ifdef MPPA_MASTER

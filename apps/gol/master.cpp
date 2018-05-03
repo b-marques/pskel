@@ -131,7 +131,7 @@ int main(int argc, char **argv){
 //	std::chrono::time_point<std::chrono::steady_clock> start = mppa_master_get_time();
 
 	//Schedule computation to slaves
-	stencil.scheduleMPPA("cluster_bin", nb_clusters, nb_threads, width, height, tilingHeight, tilingWidth, iterations, innerIterations);
+	stencil.scheduleMPPA("gol-async-slave", nb_clusters, nb_threads, width, height, tilingHeight, tilingWidth, iterations, innerIterations);
 
 //	std::chrono::time_point<std::chrono::steady_clock> end = mppa_master_get_time();
 //	cout<<"Master Time: " << mppa_master_diff_time(start,end) << endl;
