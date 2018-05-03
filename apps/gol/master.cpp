@@ -101,17 +101,17 @@ int main(int argc, char **argv){
 	// 	}
 	// }
 
-	std::string grid;
-	for(int h = 0+ halo_value; h < height + halo_value; h++) {
-	 for(int w = 0+ halo_value ; w < width + halo_value;  w++) {
-	 	int element = inputGrid(h,w);
-			char celement[10];
-			sprintf(celement, " %d", element);
-	 	grid+= celement;
-	 }
-	 grid += "\n";
-	}
-	std::cout << grid << std::endl;
+	// std::string grid;
+	// for(int h = 0+ halo_value; h < height + halo_value; h++) {
+	//  for(int w = 0+ halo_value ; w < width + halo_value;  w++) {
+	//  	int element = inputGrid(h,w);
+	// 		char celement[10];
+	// 		sprintf(celement, " %d", element);
+	//  	grid+= celement;
+	//  }
+	//  grid += "\n";
+	// }
+	// std::cout << grid << std::endl;
 
 	// std::string grid;
 	// for(int h = 0; h < height + halo_value*2; h++) {
@@ -137,34 +137,34 @@ int main(int argc, char **argv){
 //	cout<<"Master Time: " << mppa_master_diff_time(start,end) << endl;
 
 	// std::string grid;
-	int outter_iterations = ceil(float(iterations)/innerIterations);
-	if(outter_iterations %2 == 1) {
-		grid = "";
-		for(int h=0+ halo_value; h < height + halo_value; h++) {
-		 for(int w=0+ halo_value; w < width + halo_value; w++) {
-		 	int element = outputGrid(h,w);
-				char celement[10];
-				sprintf(celement, " %d", element);
-		 	grid+= celement;
-		 }
-		 grid += "\n";
-		}
-		std::cout << "printing output" << std::endl;
-		std::cout << grid << std::endl;
-	} else { 
-		grid = "";
-		for(int h=0+ halo_value; h < height + halo_value; h++) {
-		 for(int w=0+ halo_value; w < width + halo_value; w++) {
-		 	int element = inputGrid(h,w);
-				char celement[10];
-				sprintf(celement, " %d", element);
-		 	grid+= celement;
-		 }
-		 grid += "\n";
-		}
-		std::cout << "printing input" << std::endl;
-		std::cout << grid << std::endl;
-	}
+	// int outter_iterations = ceil(float(iterations)/innerIterations);
+	// if(outter_iterations %2 == 1) {
+	// 	grid = "";
+	// 	for(int h=0+ halo_value; h < height + halo_value; h++) {
+	// 	 for(int w=0+ halo_value; w < width + halo_value; w++) {
+	// 	 	int element = outputGrid(h,w);
+	// 			char celement[10];
+	// 			sprintf(celement, " %d", element);
+	// 	 	grid+= celement;
+	// 	 }
+	// 	 grid += "\n";
+	// 	}
+	// 	std::cout << "printing output" << std::endl;
+	// 	std::cout << grid << std::endl;
+	// } else { 
+	// 	grid = "";
+	// 	for(int h=0+ halo_value; h < height + halo_value; h++) {
+	// 	 for(int w=0+ halo_value; w < width + halo_value; w++) {
+	// 	 	int element = inputGrid(h,w);
+	// 			char celement[10];
+	// 			sprintf(celement, " %d", element);
+	// 	 	grid+= celement;
+	// 	 }
+	// 	 grid += "\n";
+	// 	}
+	// 	std::cout << "printing input" << std::endl;
+	// 	std::cout << grid << std::endl;
+	// }
 		
 	// grid = "";
 	// for(int h=0; h < height + halo_value*2; h++) {

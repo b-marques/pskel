@@ -8,8 +8,8 @@
 #define PSKEL_MPPA
 #define MPPA_SLAVE
 
+#include "../../include/mppa_utils.h"
 #include "../../include/PSkel.h"
-#include "../../include/hr_time.h"
 
 #define MASK_RADIUS 2
 #define MASK_WIDTH  5
