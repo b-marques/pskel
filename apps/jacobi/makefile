@@ -19,7 +19,7 @@ cppflags += -D_KALRAY_MPPA256
 lflags := -Wl,--defsym=_LIBNOC_DISABLE_FIFO_FULL_CHECK=0
 
 #=============================================================================
-# Game of Life - Async API
+# Jacobi - Async API
 #=============================================================================
 
 io-bin += jacobi-async-master
