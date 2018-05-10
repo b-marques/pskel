@@ -190,7 +190,7 @@ namespace PSkel{
             argv_slave[12] = NULL;
 
 
-            this->mppa_init_io_cluster(nb_clusters);
+            this->mppa_init_io_cluster((int)total_size < nb_clusters ? total_size : nb_clusters);
 
             int nb_computated_tiles = 0;
             // Spawn slave processes
