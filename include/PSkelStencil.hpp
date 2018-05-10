@@ -273,6 +273,8 @@ namespace PSkel{
             double computation_time = 0;
             double barrier_time = 0;
 
+            mppa_rpc_barrier_all();
+
             std::chrono::time_point<std::chrono::steady_clock> begin_exec = mppa_slave_get_time();
             std::chrono::time_point<std::chrono::steady_clock> begin_comm = mppa_slave_get_time();
             this->input.mppa_segment_clone(1);
